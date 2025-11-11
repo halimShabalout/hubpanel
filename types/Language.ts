@@ -7,7 +7,8 @@ export interface LanguageLinks {
 export interface Language {
   id: number;
   code: string;       
-  name: string;      
+  name: string;   
+  isDefault: boolean;   
   createdAt: string;
   updatedAt: string;
   _links?: LanguageLinks; 

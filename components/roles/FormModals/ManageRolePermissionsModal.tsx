@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
 import { usePermissions } from "@/hooks/usePermissions";
-import { rolePermissionService } from "@/services/rolePermissionService";
-import { Permission } from "@/types/Permission";
+import { useRolePermissions, useUpdateRolePermissions } from "@/hooks/useRolePermissions";
+import Label from "@/components/form/Label";
+import Checkbox from "@/components/form/input/Checkbox";
+import { LoadingIcon } from "@/icons";
 
 interface Props {
   isOpen: boolean;
@@ -15,91 +17,114 @@ interface Props {
 }
 
 const ManageRolePermissionsModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, role }) => {
-  const { permissions = [], isLoading } = usePermissions();
+  const { permissions = [], isLoading: isPermissionsLoading } = usePermissions();
+
+  const { permissionIds = [], isLoading: isRolePermissionsLoading } = useRolePermissions(role?.id ?? 0);
+  const updateRolePermissions = useUpdateRolePermissions();
+
   const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-useEffect(() => {
-  const fetchRolePermissions = async () => {
-    if (!role?.id) return;
-    try {
-      const res = await rolePermissionService.getRolePermissions(role.id);
+  const isPending = updateRolePermissions.isPending;
 
-      const ids = res.map((p: Permission) => p.id);
-      setSelectedPermissions(ids);
-    } catch (err) {
-      console.error("Error fetching role permissions:", err);
+  const isModified = useMemo(() => {
+    const original = [...permissionIds].sort((a, b) => a - b);
+    const current = [...selectedPermissions].sort((a, b) => a - b);
+
+    return JSON.stringify(original) !== JSON.stringify(current);
+  }, [permissionIds, selectedPermissions]);
+
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedPermissions(permissionIds);
+      setMessage(null);
     }
-  };
-  if (isOpen) fetchRolePermissions();
-}, [isOpen, role]);
+  }, [permissionIds, isOpen]);
+
 
   const togglePermission = (permissionId: number) => {
-    setSelectedPermissions((prev) =>
-      prev.includes(permissionId)
-        ? prev.filter((id) => id !== permissionId)
-        : [...prev, permissionId]
+    setSelectedPermissions(prev =>
+      prev.includes(permissionId) ? prev.filter(id => id !== permissionId) : [...prev, permissionId]
     );
   };
 
   const handleSave = async () => {
     if (!role?.id) return;
-    setLoading(true);
+    setMessage(null);
     try {
-      await rolePermissionService.updateRolePermissions(role.id, selectedPermissions);
+      await updateRolePermissions.mutateAsync({ roleId: role.id, permissionIds: selectedPermissions });
+      
       setMessage("Permissions updated successfully!");
+
       onSuccess();
+
       setTimeout(() => {
-        setMessage(null);
         onClose();
       }, 1000);
     } catch (err) {
       console.error(err);
       setMessage("Error updating permissions.");
-    } finally {
-      setLoading(false);
     }
   };
 
+  const isLoading = isPermissionsLoading || isRolePermissionsLoading;
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-xl p-8">
-      <h3 className="text-lg font-semibold text-center mb-4">
+    <Modal
+      isOpen={isOpen}
+      onClose={isPending ? () => {} : onClose}
+      className="max-w-xl p-8"
+    >
+      <h4 className="mb-6 text-lg font-semibold text-gray-800 dark:text-white/90 text-center">
         Manage Permissions for {role?.name}
-      </h3>
+      </h4>
 
       {message && (
-        <p
-          className={`mb-4 text-center ${message.includes("Error") ? "text-red-600" : "text-green-600"
-            }`}
-        >
+        <p className={`mb-4 text-center ${message.includes("Error") ? "text-red-600" : "text-green-600"}`}>
           {message}
         </p>
       )}
 
-      {isLoading ? (
+      {isLoading && !permissions.length ? (
         <p>Loading permissions...</p>
       ) : (
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          {permissions.map((permission) => (
-            <label key={permission.id} className="flex items-center gap-2">
-              <input
-                type="checkbox"
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+          {permissions.map(permission => (
+            <Label key={permission.id} className="flex items-center gap-2 cursor-pointer">
+              <Checkbox
                 checked={selectedPermissions.includes(permission.id)}
                 onChange={() => togglePermission(permission.id)}
+                disabled={isPending}
               />
-              <span>{permission.name}</span>
-            </label>
+              <span className={isPending ? "opacity-75" : ""}>{permission.name}</span>
+            </Label>
           ))}
         </div>
       )}
 
       <div className="flex justify-end gap-3">
-        <Button size="sm" variant="outline" onClick={onClose} disabled={loading}>
-          Close
+        <Button size="sm" variant="outline" onClick={onClose} disabled={isPending}>
+            Close
         </Button>
-        <Button size="sm" onClick={handleSave} disabled={loading}>
-          {loading ? "Saving..." : "Save"}
+        <Button
+          size="sm"
+          onClick={handleSave}
+          disabled={isPending || !isModified}
+          className={isPending ? "opacity-75 cursor-not-allowed flex items-center justify-center text-white" : "text-white"}
+        >
+          {isPending ? (
+             <>
+                <LoadingIcon
+                  width={16}
+                  height={16}
+                  className="animate-spin -ml-1 mr-3 !text-white !opacity-100 dark:!invert-0"
+                />
+                Updating...
+              </>
+          ) : (
+            "Update"
+          )}
         </Button>
       </div>
     </Modal>

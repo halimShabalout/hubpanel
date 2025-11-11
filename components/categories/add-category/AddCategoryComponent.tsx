@@ -1,24 +1,46 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Label from "@/components/form/Label";
 import InputField from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
+import TextArea from "@/components/form/input/TextArea";
+import FileInput from "@/components/form/input/FileInput";
+import Form from "@/components/form/Form";
+import { LoadingIcon } from "@/icons";
+
+interface FormState {
+  name: string;
+  description: string;
+  alt_text: string;
+}
 
 const AddCategoryComponent: React.FC = () => {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     name: "",
     description: "",
     alt_text: "",
   });
 
-  const [fileName, setFileName] = useState("No file chosen");
+  const INITIAL_FILE_NAME = "No file chosen";
+
+  const [fileName, setFileName] = useState(INITIAL_FILE_NAME);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
 
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(false);
+      }, 4000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFileName(e.target.files?.[0]?.name || "No file chosen");
+    setFileName(e.target.files?.[0]?.name || INITIAL_FILE_NAME);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -26,29 +48,32 @@ const AddCategoryComponent: React.FC = () => {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleTextAreaChange = (value: string, name: keyof FormState) => {
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = () => {
     setLoading(true);
     setError(false);
     setSuccess(false);
 
-    // Simulate API call
+    if (form.name.trim() === "" || fileName === INITIAL_FILE_NAME) {
+      setError(true);
+      setLoading(false);
+      return;
+    }
+
     setTimeout(() => {
-      if (form.name.trim() === "" || fileName === "No file chosen") {
-        setError(true);
-        setLoading(false);
-      } else {
-        setSuccess(true);
-        setForm({ name: "", description: "", alt_text: "" });
-        setFileName("No file chosen");
-        setLoading(false);
-      }
+      setSuccess(true);
+      setForm({ name: "", description: "", alt_text: "" });
+      setFileName(INITIAL_FILE_NAME);
+      setLoading(false);
     }, 1000);
   };
 
   return (
     <>
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
         Add New Category
       </h3>
 
@@ -64,7 +89,7 @@ const AddCategoryComponent: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <Label htmlFor="name" className="text-md text-gray-800 dark:text-white/90">
               Category Name <span className="text-error-500">*</span>
@@ -75,7 +100,6 @@ const AddCategoryComponent: React.FC = () => {
               value={form.name}
               onChange={handleChange}
               placeholder="Enter category name"
-              className="placeholder:text-gray-800 dark:placeholder:text-white/90"
             />
           </div>
 
@@ -83,14 +107,11 @@ const AddCategoryComponent: React.FC = () => {
             <Label htmlFor="description" className="text-md text-gray-800 dark:text-white/90">
               Description
             </Label>
-            <textarea
-              id="description"
-              name="description"
-              rows={4}
+            <TextArea
               value={form.description}
-              onChange={handleChange}
+              onChange={(value) => handleTextAreaChange(value, "description")}
+              rows={4}
               placeholder="Enter description"
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-600 p-3 text-gray-900 dark:text-white/90 placeholder:text-gray-800 dark:placeholder:text-white/90 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition"
             />
           </div>
 
@@ -99,25 +120,13 @@ const AddCategoryComponent: React.FC = () => {
               <Label htmlFor="file" className="text-md text-gray-800 dark:text-white/90">
                 Category Image <span className="text-error-500">*</span>
               </Label>
-              <label
-                htmlFor="file"
-                className="block w-full border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-6 text-center cursor-pointer hover:border-brand-500 transition"
-                aria-describedby="fileHelp"
-              >
-                <input
-                  id="file"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                <span className="text-gray-400 dark:text-gray-300">Click to select an image</span>
-                <br />
-                <span className="text-gray-800 dark:text-white">{fileName}</span>
-              </label>
-              <span id="fileHelp" className="sr-only">
-                Upload category image
-              </span>
+              <FileInput
+                onChange={handleFileChange}
+                className="w-full"
+                accept="image/*"
+                placeholder="Choose File"
+                fileName={fileName}
+              />
             </div>
 
             <div>
@@ -130,7 +139,6 @@ const AddCategoryComponent: React.FC = () => {
                 value={form.alt_text}
                 onChange={handleChange}
                 placeholder="Enter alt text"
-                className="placeholder:text-gray-800 dark:placeholder:text-white/90"
               />
             </div>
           </div>
@@ -140,13 +148,24 @@ const AddCategoryComponent: React.FC = () => {
               type="submit"
               variant="primary"
               size="sm"
-              disabled={loading}
-              className={loading ? "opacity-50 cursor-not-allowed" : ""}
+              disabled={loading || success}
+              className={loading ? "opacity-75 cursor-not-allowed flex items-center justify-center" : "text-white"}
             >
-              {loading ? "Creating..." : "Create"}
+              {loading ? (
+                <>
+                  <LoadingIcon
+                    width={16}
+                    height={16}
+                    className="animate-spin -ml-1 mr-3 !text-white !opacity-100 dark:!invert-0"
+                  />
+                  Creating...
+                </>
+              ) : (
+                "Create"
+              )}
             </Button>
           </div>
-        </form>
+        </Form>
       </div>
     </>
   );

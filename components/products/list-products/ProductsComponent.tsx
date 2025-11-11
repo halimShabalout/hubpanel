@@ -15,7 +15,8 @@ const mockProducts = [
     id: 1,
     name: "Smartphone",
     description: "Latest model smartphone",
-    category: "Electronics",
+    category_id: 1,
+    category: { id:1, name: "Electronics"},
     stock_quantity: 20,
     is_active: true,
     is_featured: true,
@@ -25,7 +26,8 @@ const mockProducts = [
     id: 2,
     name: "T-Shirt",
     description: "Cotton casual t-shirt",
-    category: "Clothing",
+    category_id: 2,
+    category: { id:2, name: "Clothing"},
     stock_quantity: 50,
     is_active: true,
     is_featured: false,
@@ -35,7 +37,8 @@ const mockProducts = [
     id: 3,
     name: "Cooking Book",
     description: "Learn new recipes",
-    category: "Books",
+    category_id: 3,
+    category: { id:3, name: "Books"},
     stock_quantity: 15,
     is_active: false,
     is_featured: false,
@@ -105,7 +108,7 @@ const ProductsComponent: React.FC = () => {
                         className="w-12 h-12 object-cover rounded"
                       />
                     </TableCell>
-                    <TableCell className="px-6 py-4 text-gray-800 dark:text-white">{product.category}</TableCell>
+                    <TableCell className="px-6 py-4 text-gray-800 dark:text-white">{product.category?.name || "-" }</TableCell>
                     <TableCell className="px-6 py-4 text-gray-800 dark:text-white">{product.name}</TableCell>
                     <TableCell className="px-6 py-4 text-gray-800 dark:text-white">{product.description}</TableCell>
                     <TableCell className="px-6 py-4 text-gray-800 dark:text-white">{product.stock_quantity}</TableCell>

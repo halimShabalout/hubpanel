@@ -1,16 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
 import InputField from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
 import MultiSelect from "@/components/form/MultiSelect";
+import TitleComponent from "@/components/ui/TitleComponent";
+import Form from "@/components/form/Form";
 import { useRoles } from "@/hooks/useRoles";
 import { useLanguages } from "@/hooks/useLanguages";
 import { User } from "@/types/User";
 import { useUpdateUser } from "@/hooks/useUsers";
+import { LoadingIcon } from "@/icons";
 
 interface Props {
   isOpen: boolean;
@@ -29,36 +32,68 @@ const EditUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, user }) =>
   });
 
   const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
   const { roles = [], isLoading: rolesLoading } = useRoles();
   const { languages = [], isLoading: langsLoading } = useLanguages();
   const updateUser = useUpdateUser();
 
+  const isPending = updateUser.isPending;
+
   useEffect(() => {
     if (!isOpen) setMessage(null);
   }, [isOpen]);
 
-  // --- Initialize form with user's current data ---
   useEffect(() => {
     if (user && !rolesLoading && !langsLoading) {
+      const initialRoleIds = user.userRoles?.map((ur) => ur.role.id) || [];
+
       setForm({
         username: user.username || "",
         email: user.email || "",
-        roleIds: user.userRoles?.map((ur) => ur.role.id) || [],
+        roleIds: initialRoleIds,
         languageId: user.language?.id || user.languageId,
-        status: user.status === "active" || user.status === "inactive" ? user.status : "active",
+        status: (user.status === "active" || user.status === "inactive" ? user.status : "active"),
       });
       setMessage(null);
     }
-  }, [user, rolesLoading, langsLoading]);
+  }, [user, rolesLoading, langsLoading, isOpen]);
 
   const handleChange = (field: string, value: any) => {
     setForm({ ...form, [field]: value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const isModified = useMemo(() => {
+    if (!user) return false;
+
+    const arraysEqual = (a: number[], b: number[]) => {
+      if (a.length !== b.length) return false;
+      const setA = new Set(a);
+      const setB = new Set(b);
+      return a.every(item => setB.has(item)) && b.every(item => setA.has(item));
+    };
+
+    const initialRoleIds = user.userRoles?.map((ur) => ur.role.id) || [];
+    const roleIdsChanged = !arraysEqual(form.roleIds, initialRoleIds);
+
+    const languageIdChanged = form.languageId !== (user.language?.id || user.languageId);
+
+    const usernameChanged = form.username.trim() !== (user.username || "");
+    const emailChanged = form.email.trim() !== (user.email || "");
+    const statusChanged = form.status !== (user.status || "active");
+
+    return usernameChanged || emailChanged || roleIdsChanged || languageIdChanged || statusChanged;
+  }, [form, user]);
+
+  const isFormInvalid = useMemo(() => {
+    return (
+      form.username.trim() === "" ||
+      form.email.trim() === "" ||
+      form.roleIds.length === 0 ||
+      form.languageId === undefined
+    );
+  }, [form]);
+
+  const handleSubmit = async () => {
     if (!user || !user.id) return;
 
     if (form.roleIds.length === 0) {
@@ -66,9 +101,18 @@ const EditUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, user }) =>
       return;
     }
 
-    setLoading(true);
+    setMessage(null);
+
+    const payload = {
+      username: form.username.trim(),
+      email: form.email.trim(),
+      status: form.status,
+      languageId: form.languageId,
+      roleIds: form.roleIds,
+    };
+
     try {
-      await updateUser.mutateAsync({ id: user.id, data: form });
+      await updateUser.mutateAsync({ id: user.id, data: payload });
 
       setMessage("User updated successfully!");
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -79,8 +123,6 @@ const EditUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, user }) =>
     } catch (err) {
       console.error(err);
       setMessage("Error updating user. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -90,10 +132,11 @@ const EditUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, user }) =>
       onClose={onClose}
       className="w-full max-w-[600px] p-8 lg:p-10 mx-4 sm:mx-auto"
     >
-      <form onSubmit={handleSubmit}>
-        <h4 className="mb-6 text-lg font-semibold text-gray-800 dark:text-white/90 text-center">
-          Edit User
-        </h4>
+      <Form onSubmit={handleSubmit}>
+        <TitleComponent
+          title="Edit User"
+          className="mb-6 font-semibold text-center"
+        />
 
         {message && (
           <p
@@ -105,7 +148,6 @@ const EditUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, user }) =>
         )}
 
         <div className="space-y-6">
-          {/* Username & Email */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <Label>Username</Label>
@@ -129,7 +171,6 @@ const EditUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, user }) =>
             </div>
           </div>
 
-          {/* Roles */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <Label>Roles</Label>
@@ -138,7 +179,6 @@ const EditUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, user }) =>
                   value: role.id.toString(),
                   text: role.name,
                   label: role.name,
-                  selected: form.roleIds.includes(role.id),
                 }))}
                 defaultSelected={form.roleIds.map((id) => id.toString())}
                 onChange={(selected) => handleChange(
@@ -146,12 +186,10 @@ const EditUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, user }) =>
                   selected.map((v) => parseInt(v))
                 )}
                 placeholder={rolesLoading ? "Loading roles..." : "Select Role"}
-                disabled={rolesLoading}
+                disabled={rolesLoading || isPending}
               />
-
             </div>
 
-            {/* Language */}
             <div className="flex-1">
               <Label>Language</Label>
               <Select
@@ -162,13 +200,12 @@ const EditUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, user }) =>
                   label: l.name,
                 }))}
                 placeholder={langsLoading ? "Loading languages..." : "Select Language"}
-                disabled={langsLoading}
+                disabled={langsLoading || isPending}
                 required
               />
             </div>
           </div>
 
-          {/* Status */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <Label>Status</Label>
@@ -181,21 +218,36 @@ const EditUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, user }) =>
                 ]}
                 placeholder="Select Status"
                 required
+                disabled={isPending}
               />
             </div>
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex items-center justify-end gap-3 mt-8">
-          <Button size="sm" variant="outline" onClick={onClose} disabled={loading}>
+          <Button size="sm" variant="outline" onClick={onClose} disabled={isPending}>
             Close
           </Button>
-          <Button size="sm" type="submit" disabled={loading}>
-            {loading ? "Saving..." : "Update"}
+          <Button
+            size="sm"
+            type="submit"
+            disabled={isPending || !isModified || isFormInvalid}
+          >
+            {isPending ? (
+              <>
+                <LoadingIcon
+                  width={16}
+                  height={16}
+                  className="animate-spin -ml-1 mr-3 !text-white !opacity-100 dark:!invert-0"
+                />
+                Updating...
+              </>
+            ) : (
+              "Update"
+            )}
           </Button>
         </div>
-      </form>
+      </Form>
     </Modal>
   );
 };

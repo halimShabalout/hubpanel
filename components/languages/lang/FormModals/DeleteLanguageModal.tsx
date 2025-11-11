@@ -18,7 +18,7 @@ interface Props {
 const DeleteLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, language }) => {
   const [message, setMessage] = useState<string | null>(null);
   const deleteLanguage = useDeleteLanguage();
-  const [loading, setLoading] = useState(false);
+  const isPending = deleteLanguage.isPending; 
 
   useEffect(() => {
     if (!isOpen) {
@@ -27,9 +27,9 @@ const DeleteLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, lang
   }, [isOpen]);
 
   const handleDelete = async () => {
-    if (!language) return;
+    if (!language?.id) return;
 
-    setLoading(true);
+    setMessage(null);
 
     try {
       await deleteLanguage.mutateAsync(language.id);
@@ -42,8 +42,6 @@ const DeleteLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, lang
     } catch (err) {
       console.error(err);
       setMessage("Error deleting language. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -70,16 +68,16 @@ const DeleteLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, lang
       </div>
 
       <div className="mt-6 flex justify-end gap-3">
-        <Button size="sm" variant="outline" onClick={onClose} disabled={loading}>
+        <Button size="sm" variant="outline" onClick={onClose} disabled={isPending}>
           Cancel
         </Button>
         <Button
           size="sm"
           className="bg-red-600 hover:bg-red-700 text-white"
           onClick={handleDelete}
-          disabled={loading}
+          disabled={isPending}
         >
-          {loading ? "Deleting..." : "Delete"}
+          {isPending ? "Deleting..." : "Delete"}
         </Button>
       </div>
     </Modal>

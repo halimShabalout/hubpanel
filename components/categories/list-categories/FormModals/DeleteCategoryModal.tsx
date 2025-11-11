@@ -1,49 +1,49 @@
 "use client";
 
 import React from "react";
-import { Modal } from "@/components/ui/modal";
-import Button from "@/components/ui/button/Button";
-import { Category } from "@/types/Category";
+import DeleteConfirmModal from "@/components/ui/DeleteConfirmModal"; 
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  category: Partial<Category>;
+  category?: {
+    name: string;
+    id?: number; 
+  };
 }
 
 const DeleteCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, category }) => {
-  const handleDelete = () => {
-    // Call API or perform deletion logic here
-    if (onSuccess) onSuccess();
-    onClose();
+
+  const handleDeleteCategory = async (): Promise<void> => {
+    
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (category?.name === "Electronics") {
+          reject(new Error("Cannot delete essential category: Electronics"));
+          return;
+        }
+
+        if (onSuccess) onSuccess();
+        resolve();
+
+      }, 1200);
+    });
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-md p-6">
-      <div className="pt-4 pb-4 text-center">
-        <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
-          Confirm Deletion
-        </h4>
-
-        <p className="text-sm leading-6 text-gray-600 dark:text-gray-300">
-          Are you sure you want to delete <strong>"{category.name}"</strong>? This action cannot be undone.
-        </p>
-      </div>
-
-      <div className="mt-6 flex justify-end gap-3">
-        <Button size="sm" variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button
-          size="sm"
-          className="bg-red-600 hover:bg-red-700 text-white"
-          onClick={handleDelete}
-        >
-          Delete
-        </Button>
-      </div>
-    </Modal>
+    <DeleteConfirmModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={handleDeleteCategory}
+      title="Confirm Category Deletion"
+      message={
+        <>
+          Are you sure you want to delete <strong>"{category?.name}"</strong>? This action cannot be undone.
+        </>
+      }
+      errorMessage="Error deleting category. This category might be in use or protected."
+    />
   );
 };
 

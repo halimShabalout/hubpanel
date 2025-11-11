@@ -19,7 +19,7 @@ const RefreshButton: React.FC<RefreshButtonProps> = ({ onRefresh, label = "Refre
         try {
             await Promise.resolve(onRefresh());
         } finally {
-            setTimeout(() => setRotating(false), 800);
+            setTimeout(() => setRotating(false), 500);
         }
     };
 

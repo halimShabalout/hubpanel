@@ -8,6 +8,6 @@ export interface Product {
   stock_quantity: number;
   is_active: boolean;
   is_featured:boolean;
-  category_id?: string;
+  category_id?: number;
   category?: Category;
 }

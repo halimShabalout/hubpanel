@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/table";
-import { PencilIcon, TrashBinIcon } from "@/icons";
+import { Table, TableBody, Th, Td, TableHeader, TableRow } from "@/components/ui/table";
 import Button from "@/components/ui/button/Button";
+import SearchBar from "@/components/form/input/SearchBar";
+import LoadingComponent from "@/components/ui/LoadingComponent";
+import TitleComponent from "@/components/ui/TitleComponent";
+import { PencilIcon, TrashBinIcon } from "@/icons";
 import AddUserModal from "./FormModals/AddUserModal";
 import EditUserModal from "./FormModals/EditUserModal";
 import DeleteUserModal from "./FormModals/DeleteUserModal";
 import { useUsers } from "@/hooks/useUsers";
-import { Search } from "lucide-react";
 import { useHasPermission } from "@/hooks/useAuth";
 import { PERMISSIONS } from "@/types/Permissions";
 import { User } from "@/types/User";
@@ -50,38 +52,24 @@ const UsersComponent = () => {
   const closeEditModal = () => setEditModalOpen(false);
   const closeDeleteModal = () => setDeleteModalOpen(false);
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-10">
-        <p className="text-gray-600 dark:text-gray-300">Loading users...</p>
-      </div>
-    );
-  }
+  if (isLoading) { <LoadingComponent title="Users" /> }
 
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 lg:mb-7">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-          Users
-        </h3>
-
+        <TitleComponent title="Users" />
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-3">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Total: {filteredUsers.length}
             </p>
             <div className="relative">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search user..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 pr-3 py-2 text-sm border rounded-lg bg-white dark:bg-slate-900 dark:text-gray-100 dark:border-white/10 focus:ring-2 focus:ring-primary/40 outline-none"
+              <SearchBar
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
               />
             </div>
           </div>
-
           {canAddUser && (
             <Button className="h-9 px-4 text-sm" onClick={() => setAddModalOpen(true)}>
               Add
@@ -90,30 +78,19 @@ const UsersComponent = () => {
         </div>
       </div>
 
+      {/* --- Table Section --- */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="max-w-full overflow-x-auto">
           <div className="min-w-[800px]">
             <Table>
               <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                 <TableRow>
-                  <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
-                    Name
-                  </TableCell>
-                  <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
-                    Email
-                  </TableCell>
-                  <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
-                    Role
-                  </TableCell>
-                  <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
-                    Language
-                  </TableCell>
-                  <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
-                    Status
-                  </TableCell>
-                  <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
-                    Action
-                  </TableCell>
+                  <Th> Name </Th>
+                  <Th> Email </Th>
+                  <Th> Role </Th>
+                  <Th> Language</Th>
+                  <Th> Status</Th>
+                  <Th> Action</Th>
                 </TableRow>
               </TableHeader>
 
@@ -121,53 +98,52 @@ const UsersComponent = () => {
                 {filteredUsers.length > 0 ? (
                   filteredUsers.map((user) => (
                     <TableRow key={user.id}>
-                      <TableCell className="px-5 py-4 sm:px-6 text-start text-theme-lg dark:text-gray-100">
-                        {user.username}
-                      </TableCell>
-
-                      <TableCell className="px-5 py-4 sm:px-6 text-start text-theme-lg dark:text-gray-100">
-                        {user.email}
-                      </TableCell>
-                      <TableCell className="px-5 py-4 sm:px-6 text-start text-theme-lg dark:text-gray-100">
+                      <Td >{user.username}</Td>
+                      <Td>{user.email}</Td>
+                      <Td>
                         {user.userRoles && user.userRoles.length > 0 ? (
-                          user.userRoles.map((ur, index) => (
-                            <span key={ur.id}>
-                              {ur.role?.name}
-                              {index < user.userRoles.length - 1 ? ", " : ""}
-                            </span>
-                          ))
+                          <div className="flex flex-wrap gap-2">
+                            {user.userRoles.map((ur) => (
+                              <span
+                                key={ur.id}
+                                className="inline-flex items-center rounded-full bg-blue-100 px-3 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+                              >
+                                {ur.role?.name || "N/A"}
+                              </span>
+                            ))}
+                          </div>
                         ) : (
                           "-"
                         )}
-                      </TableCell>
-
-                      <TableCell className="px-5 py-4 sm:px-6 text-start text-theme-lg dark:text-gray-100">
+                      </Td>
+                      <Td>
                         {user.language?.name || "-"}
-                      </TableCell>
+                      </Td>
 
-                      <TableCell
-                        className={`px-5 py-4 sm:px-6 text-start text-theme-lg ${user.status === "active"
-                            ? "text-green-600 dark:text-green-400"
-                            : "text-red-600 dark:text-red-400"
+                      {/* Status */}
+                      <Td>
+                        <span className={`inline-flex items-center rounded-full px-3 py-0.5 text-xs font-medium ${user.status === "active"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                          : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
                           }`}
-                      >
-                        {user.status}
-                      </TableCell>
-
-                      <TableCell className="px-6 py-4 text-gray-800 dark:text-white">
+                        >
+                          {user.status}
+                        </span>
+                      </Td>
+                      <Td>
                         <div className="flex items-center gap-5">
                           {canEditUser && (
-                            <button onClick={() => openEditModal(user)}>
+                            <button onClick={() => openEditModal(user)} title="Edit User">
                               <PencilIcon />
                             </button>
                           )}
                           {canDeleteUser && (
-                            <button onClick={() => openDeleteModal(user)}>
+                            <button onClick={() => openDeleteModal(user)} title="Delete User">
                               <TrashBinIcon />
                             </button>
                           )}
                         </div>
-                      </TableCell>
+                      </Td>
                     </TableRow>
                   ))
                 ) : (
@@ -186,6 +162,7 @@ const UsersComponent = () => {
         </div>
       </div>
 
+      {/* --- Modals --- */}
       <AddUserModal
         isOpen={addModalOpen}
         onClose={() => setAddModalOpen(false)}

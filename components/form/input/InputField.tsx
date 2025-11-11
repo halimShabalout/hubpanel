@@ -9,8 +9,8 @@ interface InputProps {
   defaultValue?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
-  min?: string;
-  max?: string;
+  min?: string | number;
+  max?: string | number;
   readOnly?: boolean;
   step?: number;
   disabled?: boolean;
@@ -48,7 +48,8 @@ const Input: FC<InputProps> = ({
   required,
 }) => {
   // Determine input styles based on state (disabled, success, error)
-  let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 ${className}`;
+  // 💡 MODIFICATION: Changed placeholder:text-gray-400 to placeholder:text-gray-500 
+  let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-500 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/50 dark:focus:border-brand-800 ${className}`;
 
   // Add styles for the different states
   if (disabled) {
@@ -60,6 +61,10 @@ const Input: FC<InputProps> = ({
   } else {
     inputClasses += ` bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800`;
   }
+  
+  // Ensure min/max are converted to strings if they are numbers for HTML attribute consistency
+  const minAttribute = typeof min === 'number' ? String(min) : min;
+  const maxAttribute = typeof max === 'number' ? String(max) : max;
 
   return (
     <div className="relative">
@@ -79,8 +84,8 @@ const Input: FC<InputProps> = ({
         placeholder={placeholder}
         defaultValue={defaultValue}
         onChange={onChange}
-        min={min}
-        max={max}
+        min={minAttribute}
+        max={maxAttribute}
         readOnly={readOnly}
         step={step}
         disabled={disabled}

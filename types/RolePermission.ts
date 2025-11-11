@@ -1,23 +1,13 @@
-import { Permission } from "./Permission";
-import { Role } from "./Role";
-
 export interface RolePermissionLinks {
   self: string;
-  role: string;
-  permission: string;
+  edit: string;
   delete: string;
 }
 
 export interface RolePermission {
   id: number;
-  role: Role;
-  permission: Permission;
+  roleId: number;
+  permissionId: number;
   createdAt: string;
   _links?: RolePermissionLinks;
-}
-
-export interface RolePermissionResponse {
-  data: RolePermission[];
-  message: string;
-  statusCode: number;
 }

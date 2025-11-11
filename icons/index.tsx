@@ -79,7 +79,7 @@ import ProductsIconPath from "./products.svg";
 import CategoriesIconPath from "./categories.svg";
 import DashboardIconPath from "./dashboard.svg";
 import GlobeIconPath from "./globe.svg";
-
+import LoadingIconPath from "./loading.svg";
 
 export const PlusIcon = createIconComponent(PlusIconPath, "Plus");
 export const CloseIcon = createIconComponent(CloseIconPath, "Close");
@@ -138,3 +138,4 @@ export const ProductsIcon = createIconComponent(ProductsIconPath, "Products");
 export const CategoriesIcon = createIconComponent(CategoriesIconPath, "Categories");
 export const DashboardIcon = createIconComponent(DashboardIconPath, "Dashboard");
 export const LanguageIcon = createIconComponent(GlobeIconPath, "Language");
+export const LoadingIcon = createIconComponent(LoadingIconPath, "Loading");

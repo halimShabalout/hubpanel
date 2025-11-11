@@ -1,12 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Label from "@/components/form/Label";
 import InputField from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
+import Select from "@/components/form/Select";
+import TextArea from "@/components/form/input/TextArea"; 
+import Form from "@/components/form/Form";
+import Checkbox from "@/components/form/input/Checkbox";
+import { LoadingIcon } from "@/icons";
+
+interface FormState {
+  name: string;
+  description: string;
+  stock_quantity: number;
+  is_active: boolean;
+  is_featured: boolean;
+  category_id: string; 
+}
 
 const AddProductComponent: React.FC = () => {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     name: "",
     description: "",
     stock_quantity: 0,
@@ -14,6 +28,9 @@ const AddProductComponent: React.FC = () => {
     is_featured: false,
     category_id: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
 
   const categories = [
     { id: 1, name: "Electronics" },
@@ -22,25 +39,100 @@ const AddProductComponent: React.FC = () => {
     { id: 4, name: "Home & Kitchen" },
   ];
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, type, value, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : type === "number"
-          ? Number(value)
-          : value,
-    }));
+  const categoryOptions = categories.map((cat) => ({
+    value: cat.id.toString(),
+    label: cat.name,
+  }));
+
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess(false);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
+
+  const handleTextAreaChange = (value: string, name: keyof FormState) => {
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | string,
+    name?: string
+  ) => {
+    if (typeof e === 'string' && name) {
+        setForm((prev) => ({
+            ...prev,
+            [name]: name === 'stock_quantity' ? Number(e) : e,
+        }));
+        return;
+    }
+
+    if (typeof e !== 'string') {
+        const target = e.target as (HTMLInputElement | HTMLTextAreaElement) & {
+          name: string;
+          value: string;
+          type: string;
+          checked?: boolean;
+        };
+
+        const { name: fieldName, value, type, checked } = target;
+
+        if (type === "checkbox") {
+          setForm((prev) => ({
+            ...prev,
+            [fieldName]: checked,
+          }));
+          return;
+        }
+
+        if (type === "number") {
+          setForm((prev) => ({
+            ...prev,
+            [fieldName]: Number(value),
+          }));
+          return;
+        }
+
+        setForm((prev) => ({
+          ...prev,
+          [fieldName]: value,
+        }));
+    }
+  };
+
+  const handleCheckboxChange = (checked: boolean, name: keyof FormState) => {
+    setForm(prev => ({ ...prev, [name]: checked }));
+  }
+
+  const resetForm = () => {
+    setForm({
+      name: "",
+      description: "",
+      stock_quantity: 0,
+      is_active: true,
+      is_featured: false,
+      category_id: "",
+    });
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Submitted product:", form);
-    // Add your API submission logic here
+    setLoading(true);
+    setError(false);
+    setSuccess(false);
+
+    if (form.name.trim() === "" || form.category_id === "" || form.stock_quantity < 0) {
+      setError(true);
+      setLoading(false);
+      return;
+    }
+
+    setTimeout(() => {
+      setLoading(false);
+      setSuccess(true);
+      resetForm();
+    }, 1500);
   };
 
   return (
@@ -50,32 +142,35 @@ const AddProductComponent: React.FC = () => {
       </h3>
 
       <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03] lg:p-8 space-y-6">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+        {success && (
+          <div className="p-4 rounded-xl border border-success-200 bg-success-50 text-success-700 dark:border-success-700 dark:bg-success-900/20 transition-opacity duration-300">
+            Product created successfully!
+          </div>
+        )}
+        {error && (
+          <div className="p-4 rounded-xl border border-error-200 bg-error-50 text-error-700 dark:border-error-700 dark:bg-error-900/20 transition-opacity duration-300">
+            Please fill in all required fields correctly.
+          </div>
+        )}
+
+        <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
           {/* Category */}
           <div>
             <Label
-              htmlFor="category_id"
               className="text-md text-gray-800 dark:text-white/90"
             >
               Category <span className="text-red-600">*</span>
             </Label>
-            <select
-              id="category_id"
-              name="category_id"
+            <Select
               value={form.category_id}
-              onChange={handleChange}
-              className="mt-1 w-full px-4 py-3 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 transition"
+              onChange={(value) => handleChange(value, "category_id")} 
+              options={categoryOptions}
+              placeholder="Select Category"
               required
-            >
-              <option value="" disabled>
-                Select Category
-              </option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+              disabled={loading}
+            />
           </div>
 
           {/* Name */}
@@ -86,8 +181,8 @@ const AddProductComponent: React.FC = () => {
             placeholder="Enter product name"
             value={form.name}
             onChange={handleChange}
-            className="placeholder:text-gray-800 dark:placeholder:text-white/90"
             required
+            disabled={loading}
           />
 
           {/* Description */}
@@ -98,16 +193,12 @@ const AddProductComponent: React.FC = () => {
             >
               Product Description
             </Label>
-            <textarea
-              id="description"
-              name="description"
-              rows={4}
+            <TextArea
               value={form.description}
-              onChange={handleChange}
+              onChange={(value) => handleTextAreaChange(value, "description")}
+              rows={4}
               placeholder="Enter product description"
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-600 p-3
-               text-gray-900 dark:text-white/90 placeholder:text-gray-800 dark:placeholder:text-white/90
-               focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition"
+              disabled={loading}
             />
           </div>
 
@@ -118,45 +209,55 @@ const AddProductComponent: React.FC = () => {
             type="number"
             label="Stock Quantity"
             placeholder="Enter available stock"
-            value={form.stock_quantity}
+            value={form.stock_quantity.toString()} 
             onChange={handleChange}
-            className="placeholder:text-gray-800 dark:placeholder:text-white/90"
             min={0}
             required
+            disabled={loading}
           />
 
           {/* Checkboxes */}
           <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0">
-            <label className="flex items-center gap-3 pb-1">
-              <input
-                type="checkbox"
-                name="is_active"
-                checked={form.is_active}
-                onChange={handleChange}
-                className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-              />
-              <span className="text-md text-gray-800 dark:text-white/90">Active</span>
-            </label>
+            <Checkbox
+              id="is_active"
+              label="Active"
+              checked={form.is_active}
+              onChange={(checked) => handleCheckboxChange(checked, "is_active")}
+              disabled={loading}
+            />
 
-            <label className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                name="is_featured"
-                checked={form.is_featured}
-                onChange={handleChange}
-                className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-              />
-              <span className="text-md text-gray-800 dark:text-white/90">Featured</span>
-            </label>
+            <Checkbox
+              id="is_featured"
+              label="Featured"
+              checked={form.is_featured}
+              onChange={(checked) => handleCheckboxChange(checked, "is_featured")}
+              disabled={loading}
+            />
           </div>
 
           {/* Submit */}
           <div className="flex justify-end">
-            <Button type="submit" size="sm" className="text-white">
-              Create Product
+            <Button
+              type="submit"
+              size="sm"
+              disabled={loading || success}
+              className={loading ? "opacity-75 cursor-not-allowed flex items-center justify-center text-white" : "text-white"}
+            >
+              {loading ? (
+                <>
+                  <LoadingIcon
+                    width={16}
+                    height={16}
+                    className="animate-spin -ml-1 mr-3 !text-white !opacity-100 dark:!invert-0"
+                  />
+                  Creating...
+                </>
+              ) : (
+                "Create"
+              )}
             </Button>
           </div>
-        </form>
+        </Form>
       </div>
     </>
   );

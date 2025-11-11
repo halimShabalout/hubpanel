@@ -1,22 +1,33 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useLocale } from "@/context/LocaleContext";
+import { useCurrentUser } from "@/hooks/useAuth"; 
 
-
-export default function UserDropdown() {
+const UserDropdown = () => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null); 
 
+  const { data: currentUser, isLoading } = useCurrentUser();
+  
   const { messages, locale } = useLocale();
   const isRtl = locale === "ar";
+  
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-
-  function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    e.stopPropagation();
+  function toggleDropdown() {
     setIsOpen((prev) => !prev);
   }
   const handleSignOut = () => {
@@ -30,22 +41,30 @@ export default function UserDropdown() {
   function closeDropdown() {
     setIsOpen(false);
   }
+  
+  if (isLoading) {
+    return <div className="h-11 w-11 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse"></div>;
+  }
+
+  const username = currentUser?.username || messages["user"] || "User";
+  const email = currentUser?.email || "-";
+  
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}> 
       <button
         onClick={toggleDropdown}
-        className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle"
+        className="flex items-center text-gray-700 dark:text-gray-400" 
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
           <Image
             width={44}
             height={44}
             src="/images/user/user-1.png"
-            alt="User"
+            alt={`${username} Avatar`} 
           />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">user?.name</span>
+        <span className="block mr-1 font-medium text-theme-sm">{username}</span>
 
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
@@ -73,15 +92,15 @@ export default function UserDropdown() {
         style={{
           maxWidth: "calc(100vw - 1rem)",
           minWidth: "180px",
-          [isRtl ? "right" : "left"]: 0,
+          [isRtl ? "right" : "left"]: 0, 
         }}
       >
         <div>
-          {/* <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {user?.role}
-          </span> */}
+          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
+            {username} 
+          </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            user.email
+            {email}
           </span>
         </div>
         <ul className="flex flex-col gap-1 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
@@ -115,8 +134,6 @@ export default function UserDropdown() {
               onItemClick={closeDropdown}
               tag="a"
               href="https://wa.me/90504615016"
-              // target="_blank"
-              // rel="noopener noreferrer"
               className="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
             >
               <svg
@@ -134,7 +151,7 @@ export default function UserDropdown() {
                   fill=""
                 />
               </svg>
-              {messages["support"] || "support"}
+              {messages["support"] || "Support"}
 
             </DropdownItem>
 
@@ -165,3 +182,4 @@ export default function UserDropdown() {
     </div>
   );
 }
+export default UserDropdown;

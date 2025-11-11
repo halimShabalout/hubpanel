@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useMemo } from "react";
 import { PencilIcon } from "@/icons";
 
 type Props = {
@@ -13,12 +14,29 @@ type Props = {
 };
 
 const UserInfoCard = ({ user, onEdit }: Props) => {
-  const rolesText = user.userRoles?.map((ur) => ur.role.name).join(", ") || "-";
+  const RolesDisplay = useMemo(() => {
+    if (!user.userRoles || user.userRoles.length === 0) {
+      return <p className="text-sm font-medium text-gray-800 dark:text-white/90">-</p>;
+    }
+
+    return (
+      <div className="flex flex-wrap gap-2">
+        {user.userRoles.map((ur) => (
+          <span
+            key={ur.role.id}
+            className="inline-flex items-center rounded-full bg-blue-100 px-3 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+          >
+            {ur.role.name}
+          </span>
+        ))}
+      </div>
+    );
+  }, [user.userRoles]);
 
   const infoFields = [
     { label: "Username", value: user.username },
     { label: "Email", value: user.email },
-    { label: "Roles", value: rolesText },
+    { label: "Roles", element: RolesDisplay }, 
     { label: "Language", value: user.language?.name || "-" },
   ];
 
@@ -30,10 +48,18 @@ const UserInfoCard = ({ user, onEdit }: Props) => {
             Personal Info
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-7 2xl:gap-x-32">
-            {infoFields.map(({ label, value }) => (
-              <div key={label}>
-                <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">{label}</p>
-                <p className="text-sm font-medium text-gray-800 dark:text-white/90">{value}</p>
+            {infoFields.map((field) => (
+              <div key={field.label}>
+                <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">{field.label}</p>
+                
+                {/* Render the element if it exists, otherwise render the plain value */}
+                {field.element ? (
+                  field.element
+                ) : (
+                  <p className="text-sm font-medium text-gray-800 dark:text-white/90">
+                    {field.value}
+                  </p>
+                )}
               </div>
             ))}
           </div>

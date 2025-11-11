@@ -80,18 +80,21 @@ const LanguagesComponent = () => {
             </div>
           </div>
 
-          {canAddLang && (
+          {/* {canAddLang && (
             <Button className="h-9 px-4 text-sm" onClick={() => setAddModalOpen(true)}>
               Add
             </Button>
-          )}
+          )} */}
+           <Button className="h-9 px-4 text-sm" onClick={() => setAddModalOpen(true)}>
+              Add
+            </Button>
         </div>
       </div>
 
       {/* Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="max-w-full overflow-x-auto">
-          <div className="min-w-[500px]">
+          <div className="min-w-[600px]">
             <Table>
               <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                 <TableRow>
@@ -100,6 +103,10 @@ const LanguagesComponent = () => {
                   </TableCell>
                   <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                     Code
+                  </TableCell>
+                  {/* isDefault */}
+                  <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
+                    Default
                   </TableCell>
                   <TableCell isHeader className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                     Actions
@@ -117,15 +124,26 @@ const LanguagesComponent = () => {
                       <TableCell className="px-5 py-4 sm:px-6 text-start text-theme-lg dark:text-gray-100">
                         {lang.code}
                       </TableCell>
+                      <TableCell className="px-5 py-4 sm:px-6 text-start text-theme-lg dark:text-gray-100">
+                        {lang.isDefault ? (
+                          <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                            Yes
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800/30 dark:text-gray-500">
+                            No
+                          </span>
+                        )}
+                      </TableCell>
                       <TableCell className="px-6 py-4 text-gray-800 dark:text-white">
                         <div className="flex items-center gap-5">
                           {canEditLang && (
-                            <button onClick={() => openEditModal(lang)}>
+                            <button onClick={() => openEditModal(lang)} title="Edit">
                               <PencilIcon />
                             </button>
                           )}
                           {canDeleteLang && (
-                            <button onClick={() => openDeleteModal(lang)}>
+                            <button onClick={() => openDeleteModal(lang)} title="Delete">
                               <TrashBinIcon />
                             </button>
                           )}
@@ -136,7 +154,7 @@ const LanguagesComponent = () => {
                 ) : (
                   <TableRow>
                     <td
-                      colSpan={3}
+                      colSpan={4}
                       className="px-5 py-6 text-center text-gray-500 dark:text-gray-400"
                     >
                       No languages found.

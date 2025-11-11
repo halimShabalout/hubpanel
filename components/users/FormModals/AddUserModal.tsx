@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
 import InputField from "@/components/form/input/InputField";
 import Select from "@/components/form/Select";
 import MultiSelect from "@/components/form/MultiSelect";
+import TitleComponent from "@/components/ui/TitleComponent";
+import Form from "@/components/form/Form";
 import { useRoles } from "@/hooks/useRoles";
 import { useLanguages } from "@/hooks/useLanguages";
 import { useCreateUser } from "@/hooks/useUsers";
@@ -32,31 +34,39 @@ const AddUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
   });
 
   const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+
+  const isPending = createUser.isPending;
 
   useEffect(() => {
-    if (!isOpen) setMessage(null);
+    if (!isOpen) {
+      setMessage(null);
+      setForm({
+        username: "",
+        email: "",
+        password: "",
+        roleIds: [],
+        languageId: undefined,
+        status: "active",
+      });
+    }
   }, [isOpen]);
 
   const handleChange = (field: string, value: any) => {
     setForm({ ...form, [field]: value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleSubmit = async () => {
     setMessage(null);
 
     if (form.roleIds.length === 0) {
       setMessage("Please select at least one role.");
-      setLoading(false);
       return;
     }
 
     const payload = {
-      username: form.username,
-      email: form.email,
-      password: form.password,
+      username: form.username.trim(),
+      email: form.email.trim(),
+      password: form.password.trim(),
       status: form.status,
       languageId: form.languageId,
       roleIds: form.roleIds,
@@ -71,21 +81,21 @@ const AddUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
       onSuccess();
       onClose();
 
-      setForm({
-        username: "",
-        email: "",
-        password: "",
-        roleIds: [],
-        languageId: undefined,
-        status: "active",
-      });
     } catch (err) {
       console.error(err);
       setMessage("Error creating user. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
+
+  const isFormInvalid = useMemo(() => {
+    return (
+      form.username.trim() === "" ||
+      form.email.trim() === "" ||
+      form.password.trim() === "" ||
+      form.roleIds.length === 0 ||
+      form.languageId === undefined
+    );
+  }, [form]);
 
   return (
     <Modal
@@ -93,22 +103,23 @@ const AddUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
       onClose={onClose}
       className="w-full max-w-[600px] p-8 lg:p-10 mx-4 sm:mx-auto"
     >
-      <form onSubmit={handleSubmit}>
-        <h4 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90 text-center">
-          Add User
-        </h4>
+      <Form onSubmit={handleSubmit}>
+        <TitleComponent
+          title="Add User"
+          className="mb-6 font-semibold text-center"
+        />
 
         {message && (
           <p
-            className={`mb-4 text-center font-medium ${message.includes("Error") ? "text-red-600" : "text-green-600"
-              }`}
+            className={`mb-4 text-center font-medium ${
+              message.includes("Error") ? "text-red-600" : "text-green-600"
+            }`}
           >
             {message}
           </p>
         )}
 
         <div className="space-y-4">
-          {/* Username + Email */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <Label>Username</Label>
@@ -133,7 +144,6 @@ const AddUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
-          {/* Password + Roles */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <Label>Password</Label>
@@ -161,14 +171,12 @@ const AddUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
                     selected.map((v) => parseInt(v))
                   );
                 }}
-                disabled={roles.length === 0}
+                disabled={roles.length === 0 || isPending}
                 placeholder="Select Roles"
               />
-
             </div>
           </div>
 
-          {/* Language + Status */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <Label>Language</Label>
@@ -200,16 +208,19 @@ const AddUserModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex items-center justify-end gap-3 mt-6">
-          <Button size="sm" variant="outline" onClick={onClose} disabled={loading}>
+          <Button size="sm" variant="outline" onClick={onClose} disabled={isPending}>
             Close
           </Button>
-          <Button size="sm" type="submit" disabled={loading}>
-            {loading ? "Adding..." : "Add"}
+          <Button 
+            size="sm" 
+            type="submit" 
+            disabled={isPending || isFormInvalid}
+          >
+            {isPending ? "Adding..." : "Add"}
           </Button>
         </div>
-      </form>
+      </Form>
     </Modal>
   );
 };

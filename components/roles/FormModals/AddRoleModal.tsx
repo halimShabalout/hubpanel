@@ -6,6 +6,8 @@ import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
 import InputField from "@/components/form/input/InputField";
 import { useCreateRole } from "@/hooks/useRoles";
+import { LoadingIcon } from "@/icons";
+import Form from "@/components/form/Form";
 
 interface Props {
   isOpen: boolean;
@@ -22,26 +24,31 @@ const AddRoleModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
   });
 
   const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+
+  const isPending = createRole.isPending;
+  const isSuccess = message?.includes("successfully") ?? false;
 
   useEffect(() => {
     if (!isOpen) {
       setMessage(null);
+      setForm({
+        name: "",
+        description: "",
+      });
     }
   }, [isOpen]);
 
-  const handleChange = (field: string, value: string | number) => {
+  const handleChange = (field: string, value: string) => {
     setForm({ ...form, [field]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setMessage(null);
 
     const payload = {
-      name: form.name,
-      description: form.description,
+      name: form.name.trim(),
+      description: form.description.trim(),
     };
 
     try {
@@ -54,17 +61,13 @@ const AddRoleModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
       onSuccess();
       onClose();
 
-      setForm({
-        name: "",
-        description: "",
-      });
     } catch (err) {
       console.error(err);
       setMessage("Error creating role. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
+
+  const isFormEmpty = form.name.trim() === "";
 
   return (
     <Modal
@@ -72,7 +75,7 @@ const AddRoleModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
       onClose={onClose}
       className="w-full max-w-[600px] p-8 lg:p-10 mx-4 sm:mx-auto"
     >
-      <form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         <h4 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90 text-center">
           Add Role
         </h4>
@@ -115,14 +118,34 @@ const AddRoleModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         <div className="flex items-center justify-end gap-3 mt-6">
-          <Button size="sm" variant="outline" onClick={onClose} disabled={loading}>
+          <Button size="sm" variant="outline" onClick={onClose} disabled={isPending || isSuccess}>
             Close
           </Button>
-          <Button size="sm" type="submit" disabled={loading}>
-            {loading ? "Adding..." : "Add"}
+          <Button 
+            size="sm" 
+            type="submit" 
+            disabled={isPending || isFormEmpty || isSuccess}
+            className={
+              isPending
+                ? "opacity-75 cursor-not-allowed flex items-center justify-center"
+                : ""
+            }
+          >
+            {isPending ? (
+                <>
+                  <LoadingIcon
+                    width={16}
+                    height={16}
+                    className="animate-spin -ml-1 mr-3 !text-white !opacity-100 dark:!invert-0"
+                  />
+                  Adding...
+                </>
+              ) : (
+                "Add"
+              )}
           </Button>
         </div>
-      </form>
+      </Form>
     </Modal>
   );
 };

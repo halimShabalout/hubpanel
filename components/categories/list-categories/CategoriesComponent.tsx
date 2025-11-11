@@ -9,7 +9,15 @@ import DeleteCategoryModal from "./FormModals/DeleteCategoryModal";
 import { useHasPermission } from "@/hooks/useAuth";
 import { PERMISSIONS } from "@/types/Permissions";
 
-const mockCategories = [
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+  image_url: string;
+  productsCount: number;
+}
+
+const mockCategories: Category[] = [
   {
     id: 1,
     name: "Electronics",
@@ -46,9 +54,10 @@ const mockCategories = [
 
 const CategoriesComponent: React.FC = () => {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<typeof mockCategories[0] | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  
   const canAddCategory = useHasPermission(PERMISSIONS.ADD_CATEGORY);
   const canEditCategory = useHasPermission(PERMISSIONS.EDIT_CATEGORY);
   const canDeleteCategory = useHasPermission(PERMISSIONS.DELETE_CATEGORY);
@@ -59,14 +68,16 @@ const CategoriesComponent: React.FC = () => {
 
   const handleDropdownClose = () => setOpenDropdownId(null);
 
-  const handleEdit = (category: typeof mockCategories[0]) => {
+  const handleOpenEditModal = (category: Category) => {
     setSelectedCategory(category);
     setEditModalOpen(true);
+    handleDropdownClose();
   };
 
-  const handleDelete = (category: typeof mockCategories[0]) => {
+  const handleOpenDeleteModal = (category: Category) => {
     setSelectedCategory(category);
     setDeleteModalOpen(true);
+    handleDropdownClose();
   };
 
   const closeEditModal = () => setEditModalOpen(false);
@@ -81,32 +92,10 @@ const CategoriesComponent: React.FC = () => {
         </h3>
         {canAddCategory && (
         <Link href="/categories/add-category">
-          <Button className="h-9 px-4 text-sm">Add</Button>
+          <Button className="h-9 px-4 text-sm">Add Category</Button>
         </Link>
         )}
       </div>
-
-      {/* Modals */}
-      {selectedCategory && (
-        <>
-        {canEditCategory && (
-          <EditCategoryModal
-            category={selectedCategory}
-            isOpen={editModalOpen}
-            onClose={closeEditModal}
-            onSuccess={() => {}}
-          />
-          )}
-          {canDeleteCategory && (
-          <DeleteCategoryModal
-            category={selectedCategory}
-            isOpen={deleteModalOpen}
-            onClose={closeDeleteModal}
-            onSuccess={() => {}}
-          />
-          )}
-        </>
-      )}
 
       {/* Categories Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -117,12 +106,34 @@ const CategoriesComponent: React.FC = () => {
             openDropdownId={openDropdownId}
             onDropdownToggle={() => handleDropdownToggle(category.id)}
             onDropdownClose={handleDropdownClose}
-            onViewProducts={() => handleEdit(category)}
-            onEdit={() => handleEdit(category)}
-            onDelete={() => handleDelete(category)}
+            onViewProducts={() => {}} 
+            onEdit={canEditCategory ? () => handleOpenEditModal(category) : undefined}
+            onDelete={canDeleteCategory ? () => handleOpenDeleteModal(category) : undefined}
           />
         ))}
       </div>
+
+      {/* Modals */}
+      {selectedCategory && (
+        <>
+          {canEditCategory && (
+            <EditCategoryModal
+              category={selectedCategory}
+              isOpen={editModalOpen}
+              onClose={closeEditModal}
+              onSuccess={() => {}}
+            />
+          )}
+          {canDeleteCategory && (
+            <DeleteCategoryModal
+              category={selectedCategory}
+              isOpen={deleteModalOpen}
+              onClose={closeDeleteModal}
+              onSuccess={() => {}}
+            />
+          )}
+        </>
+      )}
     </>
   );
 };

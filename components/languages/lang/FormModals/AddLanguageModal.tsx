@@ -19,27 +19,39 @@ const AddLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
   const [form, setForm] = useState({
     code: "",
     name: "",
+    isDefault: false,
   });
 
   const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+
+  const isPending = createLanguage.isPending;
 
   useEffect(() => {
-    if (!isOpen) setMessage(null);
+    if (!isOpen) {
+        setMessage(null);
+        setForm({ code: "", name: "", isDefault: false });
+    }
   }, [isOpen]);
 
+  // Handle changes for text inputs
   const handleChange = (field: string, value: string) => {
     setForm({ ...form, [field]: value });
   };
+  
+  // Handle change for the checkbox input
+  const handleCheckboxChange = (checked: boolean) => {
+    setForm(prev => ({ ...prev, isDefault: checked }));
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setMessage(null);
 
     const payload = {
       code: form.code.trim(),
       name: form.name.trim(),
+      isDefault: form.isDefault,
     };
 
     try {
@@ -51,14 +63,14 @@ const AddLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
       onSuccess();
       onClose();
 
-      setForm({ code: "", name: "" });
     } catch (err) {
       console.error(err);
       setMessage("Error adding language. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
+
+  // Check if code or name fields are empty
+  const isFormEmpty = form.code.trim() === "" || form.name.trim() === "";
 
   return (
     <Modal
@@ -105,15 +117,32 @@ const AddLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
               required
             />
           </div>
+          
+          {/* isDefault */}
+          <div className="flex items-center pt-2">
+            <input
+              id="isDefault"
+              type="checkbox"
+              checked={form.isDefault}
+              onChange={(e) => handleCheckboxChange(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600"
+            />
+            <Label htmlFor="isDefault" className="ml-2 mb-0 cursor-pointer">
+              Set as Default Language
+            </Label>
+          </div>
         </div>
 
-        {/* Actions */}
         <div className="flex items-center justify-end gap-3 mt-6">
-          <Button size="sm" variant="outline" onClick={onClose} disabled={loading}>
+          <Button size="sm" variant="outline" onClick={onClose} disabled={isPending}>
             Close
           </Button>
-          <Button size="sm" type="submit" disabled={loading}>
-            {loading ? "Adding..." : "Add"}
+          <Button 
+            size="sm" 
+            type="submit" 
+            disabled={isPending || isFormEmpty}
+          >
+            {isPending ? "Adding..." : "Add"}
           </Button>
         </div>
       </form>

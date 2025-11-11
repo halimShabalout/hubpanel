@@ -26,7 +26,7 @@ export default function AdminLayoutWrapper({ children }: { children: React.React
   }
 
   return (
-    <LocaleProvider userLang={currentUser.language.key}>
+    <LocaleProvider userLang={currentUser.language.code}>
       <InnerAdminLayout>{children}</InnerAdminLayout>
     </LocaleProvider>
   );

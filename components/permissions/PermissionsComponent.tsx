@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "../ui/table";
 import { usePermissions } from "@/hooks/usePermissions";
-import { Search } from "lucide-react";
 import RefreshButton from "@/components/ui/button/RefreshButton";
+import SearchBar from "@/components/form/input/SearchBar";
 
 const PermissionsComponent = () => {
   const { permissions = [], isLoading, refetch } = usePermissions();
@@ -26,6 +26,9 @@ const PermissionsComponent = () => {
     );
   }
 
+  const hasPermissions = permissions.length > 0;
+  const hasResults = filteredPermissions.length > 0;
+
   return (
     <>
       {/* Header */}
@@ -40,16 +43,10 @@ const PermissionsComponent = () => {
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Total: {filteredPermissions.length}
             </p>
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 pr-3 py-2 text-sm border rounded-lg bg-white dark:bg-slate-900 dark:text-gray-100 dark:border-white/10 focus:ring-2 focus:ring-primary/40 outline-none"
-              />
-            </div>
+            <SearchBar 
+                searchTerm={searchTerm} 
+                onSearchChange={setSearchTerm} 
+            />
           </div>
           {/* Refresh */}
           <RefreshButton onRefresh={refetch} />
@@ -85,7 +82,7 @@ const PermissionsComponent = () => {
               </TableHeader>
 
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                {filteredPermissions.length > 0 ? (
+                {hasResults ? (
                   filteredPermissions.map((permission) => (
                     <TableRow
                       key={permission.id}
@@ -98,7 +95,7 @@ const PermissionsComponent = () => {
                         {permission.endpoint}
                       </TableCell>
                       <TableCell className="px-5 py-4 sm:px-6 text-start text-theme-lg text-gray-500 dark:text-gray-400">
-                        {new Date(permission.createdAt).toLocaleDateString()}
+                        {new Date(permission.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                       </TableCell>
                     </TableRow>
                   ))
@@ -108,7 +105,10 @@ const PermissionsComponent = () => {
                       colSpan={3}
                       className="px-5 py-6 text-center text-gray-500 dark:text-gray-400"
                     >
-                      No permissions found.
+                      {hasPermissions 
+                        ? `No results found for "${searchTerm}".`
+                        : "No permissions available."
+                      }
                     </td>
                   </TableRow>
                 )}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
@@ -16,44 +16,66 @@ interface Props {
 }
 
 const EditLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, language }) => {
+  const updateLanguage = useUpdateLanguage();
   const [form, setForm] = useState({
     code: "",
     name: "",
+    isDefault: false,
   });
 
   const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const updateLanguage = useUpdateLanguage();
+
+  const isPending = updateLanguage.isPending;
 
   // Reset message when modal closes
   useEffect(() => {
     if (!isOpen) setMessage(null);
   }, [isOpen]);
 
-  // Initialize form when language changes
   useEffect(() => {
     if (language) {
       setForm({
         code: language.code || "",
         name: language.name || "",
+        isDefault: language.isDefault || false, 
       });
       setMessage(null);
     }
-  }, [language]);
+  }, [language, isOpen]);
 
   const handleChange = (field: string, value: string) => {
     setForm({ ...form, [field]: value });
   };
+  
+  // Handle change for the checkbox input
+  const handleCheckboxChange = (checked: boolean) => {
+    setForm(prev => ({ ...prev, isDefault: checked }));
+  };
+
+  const isModified = useMemo(() => {
+    if (!language) return false;
+    
+    const codeChanged = form.code.trim() !== (language.code || "");
+    const nameChanged = form.name.trim() !== (language.name || "");
+    const isDefaultChanged = form.isDefault !== (language.isDefault || false);
+
+    return codeChanged || nameChanged || isDefaultChanged;
+  }, [form, language]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!language?.id) return;
 
-    setLoading(true);
     setMessage(null);
 
+    const payload = {
+        code: form.code.trim(),
+        name: form.name.trim(),
+        isDefault: form.isDefault,
+    };
+
     try {
-      await updateLanguage.mutateAsync({ id: language.id, data: form });
+      await updateLanguage.mutateAsync({ id: language.id, data: payload });
       setMessage("Language updated successfully!");
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -63,10 +85,12 @@ const EditLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, langua
     } catch (err) {
       console.error(err);
       setMessage("Error updating language. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
+
+  // Check if fields are empty to disable the button
+  const areFieldsEmpty = form.code.trim() === "" || form.name.trim() === "";
+
 
   return (
     <Modal
@@ -113,15 +137,33 @@ const EditLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, langua
               required
             />
           </div>
+          
+          {/* isDefault */}
+          <div className="flex items-center pt-2">
+            <input
+              id="isDefaultEdit"
+              type="checkbox"
+              checked={form.isDefault}
+              onChange={(e) => handleCheckboxChange(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600"
+            />
+            <Label htmlFor="isDefaultEdit" className="ml-2 mb-0 cursor-pointer">
+              Set as Default Language
+            </Label>
+          </div>
         </div>
 
         {/* Actions */}
         <div className="flex items-center justify-end gap-3 mt-8">
-          <Button size="sm" variant="outline" onClick={onClose} disabled={loading}>
+          <Button size="sm" variant="outline" onClick={onClose} disabled={isPending}>
             Close
           </Button>
-          <Button size="sm" type="submit" disabled={loading}>
-            {loading ? "Saving..." : "Update"}
+          <Button 
+            size="sm" 
+            type="submit" 
+            disabled={isPending || !isModified || areFieldsEmpty}
+          >
+            {isPending ? "Saving..." : "Update"}
           </Button>
         </div>
       </form>

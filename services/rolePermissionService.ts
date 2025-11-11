@@ -1,20 +1,18 @@
 import axiosInstance from "@/lib/axios";
-import { Permission } from "@/types/Permission";
+import { RolePermission } from "@/types/RolePermission";
 import { ApiResponse } from "@/types/ApiResponse";
 
-export const rolePermissionService = {
-  getRolePermissions: async (roleId: number): Promise<Permission[]> => {
-    const response = await axiosInstance.get<ApiResponse<{ roleId: number; permissions: Permission[] }>>(
-      `/roles/${roleId}/permissions`
-    );
-    return response.data.data.permissions;
-  },
+export const getRolePermissions = async (roleId: number): Promise<RolePermission[]> => {
+  const response = await axiosInstance.get<ApiResponse<RolePermission[]>>(
+    `/roles/${roleId}/permissions`
+  );
+  return response.data.data; 
+};
 
-  updateRolePermissions: async (roleId: number, permissionIds: number[]): Promise<Permission[]> => {
-    const response = await axiosInstance.patch<ApiResponse<{ roleId: number; permissions: Permission[] }>>(
-      `/roles/${roleId}/permissions`,
-      { permissionIds }
-    );
-    return response.data.data.permissions;
-  },
+export const updateRolePermissions = async (roleId: number, permissionIds: number[]): Promise<RolePermission[]> => {
+  const response = await axiosInstance.patch<ApiResponse<RolePermission[]>>(
+    `/roles/${roleId}/permissions`,
+    { permissionIds }
+  );
+  return response.data.data; 
 };

@@ -1,61 +1,78 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
 import InputField from "@/components/form/input/InputField";
 import { Role } from "@/types/Role";
 import { useUpdateRole } from "@/hooks/useRoles";
+import { LoadingIcon } from "@/icons";
+import Form from "@/components/form/Form";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  role: Role;
+  role: Role | null;
 }
 
 const EditRoleModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, role }) => {
+  const updateRole = useUpdateRole();
+  
   const [form, setForm] = useState({
     name: "",
     description: "",
   });
 
   const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  const updateRole = useUpdateRole();
+  const isPending = updateRole.isPending;
+  const isSuccess = message?.includes("successfully") ?? false; 
 
   useEffect(() => {
     if (!isOpen) {
       setMessage(null);
+      setForm({ name: "", description: "" });
     }
   }, [isOpen]);
 
-  // --- Initialize form when role loads ---
   useEffect(() => {
-    if (role) {
+    if (role && isOpen) {
       setForm({
         name: role.name || "",
         description: role.description || "",
       });
       setMessage(null);
     }
-  }, [role]);
+  }, [role, isOpen]);
 
   const handleChange = (field: string, value: string) => {
     setForm({ ...form, [field]: value });
   };
 
+  const isModified = useMemo(() => {
+    if (!role) return false;
+    
+    const nameChanged = form.name.trim() !== (role.name || "");
+    const descChanged = form.description.trim() !== (role.description || "");
+
+    return nameChanged || descChanged;
+  }, [form, role]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!role.id) return;
+    if (!role?.id) return;
 
-    setLoading(true);
     setMessage(null);
 
+    const payload = {
+        name: form.name.trim(),
+        description: form.description.trim(),
+    };
+
     try {
-      await updateRole.mutateAsync({ id: role.id, data: form });
+      await updateRole.mutateAsync({ id: role.id, data: payload });
       setMessage("Role updated successfully!");
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -63,14 +80,14 @@ const EditRoleModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, role }) =>
       onClose();
       onSuccess();
 
-      setForm({ name: "", description: "" });
     } catch (err) {
       console.error(err);
       setMessage("Error updating role. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
+
+  const areFieldsEmpty = form.name.trim() === "";
+
 
   return (
     <Modal
@@ -78,7 +95,7 @@ const EditRoleModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, role }) =>
       onClose={onClose}
       className="w-full max-w-[600px] p-8 lg:p-10 mx-4 sm:mx-auto"
     >
-      <form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         <h4 className="mb-6 text-lg font-semibold text-gray-800 dark:text-white/90 text-center">
           Edit Role
         </h4>
@@ -119,14 +136,34 @@ const EditRoleModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, role }) =>
         </div>
 
         <div className="flex items-center justify-end gap-3 mt-8">
-          <Button size="sm" variant="outline" onClick={onClose} disabled={loading}>
+          <Button size="sm" variant="outline" onClick={onClose} disabled={isPending || isSuccess}>
             Close
           </Button>
-          <Button size="sm" type="submit" disabled={loading}>
-            {loading ? "Saving..." : "Update"}
+          <Button 
+            size="sm" 
+            type="submit" 
+            disabled={isPending || !isModified || areFieldsEmpty || isSuccess}
+            className={
+              isPending
+                ? "opacity-75 cursor-not-allowed flex items-center justify-center"
+                : ""
+            }
+          >
+            {isPending ? (
+                <>
+                  <LoadingIcon
+                    width={16}
+                    height={16}
+                    className="animate-spin -ml-1 mr-3 !text-white !opacity-100 dark:!invert-0"
+                  />
+                  Updating...
+                </>
+              ) : (
+                "Update"
+              )}
           </Button>
         </div>
-      </form>
+      </Form>
     </Modal>
   );
 };

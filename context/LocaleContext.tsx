@@ -20,7 +20,7 @@ export const LocaleProvider = ({
   children: React.ReactNode;
   userLang?: string;
 }) => {
-  const [locale, setLocale] = useState<string>("ar");
+  const [locale, setLocale] = useState<string>("en");
   const [messages, setMessages] = useState<Record<string, string>>({});
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -40,12 +40,25 @@ export const LocaleProvider = ({
         const languages: Language[] = await languageService.getLanguages();
         let defaultLocale: string;
 
-        if (userLang) defaultLocale = userLang;
-        else {
+        if (userLang) {
+          defaultLocale = userLang;
+        } else {
           const stored = localStorage.getItem("locale");
-          if (stored) defaultLocale = stored;
-          else if (languages.length > 0) defaultLocale = languages[0].key || "";
-          else defaultLocale = "en";
+          if (stored) {
+            defaultLocale = stored;
+          } else if (languages.length > 0) {
+            
+            const defaultLanguage = languages.find(lang => lang.isDefault);
+            
+            if (defaultLanguage) {
+              defaultLocale = defaultLanguage.code;
+            } else {
+              defaultLocale = languages[0].code;
+            }
+
+          } else {
+            defaultLocale = "en";
+          }
         }
 
         setLocale(defaultLocale);

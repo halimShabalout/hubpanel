@@ -19,6 +19,7 @@ export const PERMISSIONS = {
   ADD_ROLE: "/roles/create",
   EDIT_ROLE: "/roles/update",
   DELETE_ROLE: "/roles/delete",
+  MANAGE_ROLE_PERMISSIONS: "/role/permissions",
 
   VIEW_PERMISSIONS: "view-permissions",
   ADD_PERMISSION: "add-permission",
@@ -26,16 +27,16 @@ export const PERMISSIONS = {
   DELETE_PERMISSION: "delete-permission",
 
   // Products
-  VIEW_PRODUCTS: "view-products",
-  ADD_PRODUCT: "add-product",
-  EDIT_PRODUCT: "edit-product",
-  DELETE_PRODUCT: "delete-product",
+  VIEW_PRODUCTS: "/products",
+  ADD_PRODUCT: "/product/create",
+  EDIT_PRODUCT: "/product/update",
+  DELETE_PRODUCT: "/product/delete",
 
   // Product Categories
-  VIEW_CATEGORIES: "view-categories",
-  ADD_CATEGORY: "add-category",
-  EDIT_CATEGORY: "edit-category",
-  DELETE_CATEGORY: "delete-category",
+  VIEW_CATEGORIES: "/categories",
+  ADD_CATEGORY: "/category/create",
+  EDIT_CATEGORY: "/category/update",
+  DELETE_CATEGORY: "/category/delete",
 
   // Dashboard
   VIEW_DASHBOARD: "view-dashboard",

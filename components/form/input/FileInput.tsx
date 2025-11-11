@@ -1,17 +1,35 @@
-import React, { FC } from "react";
+import React, { FC, InputHTMLAttributes } from "react";
 
-interface FileInputProps {
+interface FileInputProps extends InputHTMLAttributes<HTMLInputElement> {
   className?: string;
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  fileName?: string; 
 }
 
-const FileInput: FC<FileInputProps> = ({ className, onChange }) => {
+const FileInput: FC<FileInputProps> = ({ className, onChange, placeholder, fileName, ...rest }) => {
+
+  const displayFileName = fileName && fileName !== "No file chosen" ? fileName : (placeholder || "No file chosen");
+  
   return (
-    <input
-      type="file"
-      className={`focus:border-ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 shadow-theme-xs transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pl-3.5 file:pr-3 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden focus:file:ring-brand-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400 ${className}`}
-      onChange={onChange}
-    />
+    <div className={`relative h-11 w-full flex items-center rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 shadow-theme-xs dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 ${className}`}>
+      <input
+        type="file"
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+        onChange={onChange}
+        {...rest}
+        placeholder="" 
+      />
+
+      <div className="absolute inset-0 flex items-center w-full h-full overflow-hidden">
+        <div className="flex-shrink-0 cursor-pointer rounded-lg border-r border-solid border-gray-200 bg-gray-50 py-3 pl-3.5 pr-3 text-sm text-gray-700 hover:bg-gray-100 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400">
+          {placeholder || "Choose File"} 
+        </div>
+
+        <div className="truncate pl-2 pr-2 text-gray-700 dark:text-gray-300">
+          {displayFileName}
+        </div>
+      </div>
+    </div>
   );
 };
 

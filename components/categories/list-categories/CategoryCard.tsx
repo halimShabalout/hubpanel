@@ -7,14 +7,16 @@ import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 import { useLocale } from "@/context/LocaleContext";
 
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+  image_url: string;
+  productsCount: number;
+}
+
 interface CategoryCardProps {
-  category: {
-    id: number;
-    name: string;
-    description: string;
-    image_url: string;
-    productsCount: number;
-  };
+  category: Category;
   openDropdownId: number | null;
   onDropdownToggle: () => void;
   onDropdownClose: () => void;
@@ -86,10 +88,22 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                     View Products
                   </DropdownItem>
                 )}
-                {onEdit && <DropdownItem onItemClick={onEdit} className="text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                >Edit</DropdownItem>}
-                {onDelete && <DropdownItem onItemClick={onDelete} className="text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                >Delete</DropdownItem>}
+                {onEdit && (
+                  <DropdownItem 
+                    onItemClick={onEdit} 
+                    className="text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    Edit
+                  </DropdownItem>
+                )}
+                {onDelete && (
+                  <DropdownItem 
+                    onItemClick={onDelete} 
+                    className="text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    Delete
+                  </DropdownItem>
+                )}
               </Dropdown>
             </div>
           </div>
