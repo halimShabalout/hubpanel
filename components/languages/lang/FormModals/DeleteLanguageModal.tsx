@@ -36,7 +36,7 @@ const DeleteLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, lang
 
     try {
       await deleteLanguage.mutateAsync(language.id);
-      setMessage(messages["delete_success"]?.replace("Deleted", "Language deleted") || "Language deleted successfully!");
+      setMessage(messages["delete_successfully"] || "Deleted successfully!");
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -44,7 +44,7 @@ const DeleteLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, lang
       onSuccess();
     } catch (err) {
       console.error(err);
-      setMessage(messages["error"] || "Error deleting language. Please try again.");
+      setMessage(messages["delete_failed"] || "An error occurred while deleting.");
     }
   };
 
@@ -53,7 +53,7 @@ const DeleteLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, lang
       isOpen={isOpen}
       onClose={onClose}
       onConfirm={handleDelete}
-      title={messages["confirm_delete"] || "Confirm language Deletion"}
+      title={messages["confirm_delete"] || "Confirm Deletion"}
       message={
         <>
           {messages["delete_warning"] 
@@ -62,7 +62,7 @@ const DeleteLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, lang
           }
         </>
       }
-      errorMessage={messages["delete_failed"] || "Error deleting language. This language might be in use or protected."}
+      errorMessage={messages["delete_failed"] || "An error occurred while deleting."}
     />
   );
 };

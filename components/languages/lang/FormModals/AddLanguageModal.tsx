@@ -60,7 +60,7 @@ const AddLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
 
     try {
       await createLanguage.mutateAsync(payload);
-      setMessage(messages["user_created_successfully"]?.replace("User", "Language") || "Language added successfully!");
+      setMessage(messages["created_successfully"]?.replace("User", "Language") || "Created Successfully!");
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -69,7 +69,7 @@ const AddLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
 
     } catch (err) {
       console.error(err);
-      setMessage(messages["error"] || "Error adding language. Please try again.");
+      setMessage(messages["error"] || "An error occurred while creating.");
     }
   };
 
@@ -100,24 +100,24 @@ const AddLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
         <div className="space-y-4">
           {/* Code */}
           <div>
-            <Label>{messages["code"] || "Language Code"}</Label>
+            <Label>{messages["language_code"] || "Language Code"}</Label>
             <InputField
               type="text"
               value={form.code}
               onChange={(e) => handleChange("code", e.target.value)}
-              placeholder={messages["code_placeholder"] || "Enter language code (e.g. en, ar)"}
+              placeholder={messages["language_code_placeholder"] || "enter language code (e.g. en, ar)"}
               required
             />
           </div>
 
           {/* Name */}
           <div>
-            <Label>{messages["name"] || "Language Name"}</Label>
+            <Label>{messages["language_name"] || "Language Name"}</Label>
             <InputField
               type="text"
               value={form.name}
               onChange={(e) => handleChange("name", e.target.value)}
-              placeholder={messages["name_placeholder"] || "Enter language name (e.g. English, Arabic)"}
+              placeholder={messages["language_name_placeholder"] || "enter language name (e.g. English, Arabic)"}
               required
             />
           </div>
@@ -146,7 +146,7 @@ const AddLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
             type="submit"
             disabled={isPending || isFormEmpty}
           >
-            {isPending ? (messages["adding"] || "Adding...") : (messages["add"] || "Add")}
+            {isPending ? (messages["creating"] || "Creating...") : (messages["create"] || "Create")}
           </Button>
         </div>
       </Form>

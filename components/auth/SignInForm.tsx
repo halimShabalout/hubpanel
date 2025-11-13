@@ -75,7 +75,7 @@ export default function SignInForm() {
           {/* Email */}
           <div>
             <Label>
-              {messages["signin_email"] || "Email"}{" "}
+              {messages["email"] || "Email"}{" "}
               <span className="text-error-500">*</span>
             </Label>
             <Input
@@ -90,15 +90,15 @@ export default function SignInForm() {
           {/* Password */}
           <div>
             <Label>
-              {messages["signin_password"] || "Password"}{" "}
+              {messages["password"] || "Password"}{" "}
               <span className="text-error-500">*</span>
             </Label>
             <div className="relative">
               <Input
                 type={showPassword ? "text" : "password"}
                 placeholder={
-                  messages["signin_password_placeholder"] ||
-                  "Enter your password"
+                  messages["password_placeholder"] ||
+                  "enter your password"
                 }
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -133,7 +133,7 @@ export default function SignInForm() {
               href="/reset-password"
               className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
             >
-              {messages["signin_forgot_password"] || "Forgot password?"}
+              {messages["forgot_password"] || "Forgot your password?"}
             </Link>
           </div>
 
@@ -146,7 +146,7 @@ export default function SignInForm() {
               disabled={isPending}
             >
               {isPending
-                ? messages["signin_loading"] || "Loading..."
+                ? messages["loading"] || "Loading..."
                 : messages["signin_button"] || "Sign In"}
             </Button>
 

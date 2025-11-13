@@ -85,12 +85,12 @@ const AddCategoryComponent: React.FC = () => {
       <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03] lg:p-8 space-y-6">
         {success && (
           <div className="p-4 rounded-xl border border-success-200 bg-success-50 text-success-700 dark:border-success-700 dark:bg-success-900/20 transition-opacity duration-300">
-            {messages["categories_created_successfully"] || "Category created successfully!"}
+            {messages["created_successfully"] || "Created Successfully!"}
           </div>
         )}
         {error && (
           <div className="p-4 rounded-xl border border-error-200 bg-error-50 text-error-700 dark:border-error-700 dark:bg-error-900/20 transition-opacity duration-300">
-            {messages["required_fields_error"] || "Please fill in required fields."}
+            {messages["required_fields_error"] || "Please ensure all required fields are filled."}
           </div>
         )}
 
@@ -104,19 +104,19 @@ const AddCategoryComponent: React.FC = () => {
               name="name"
               value={form.name}
               onChange={handleChange}
-              placeholder={messages["product_category_name_placeholder"] || "Enter category name"}
+              placeholder={messages["category_name_placeholder"] || "enter category name"}
             />
           </div>
 
           <div>
             <Label htmlFor="description" className={LABEL_CLASS}>
-              {messages["description"] || "Description"}
+              {messages["category_description"] || "Description"}
             </Label>
             <TextArea
               value={form.description}
               onChange={(value) => handleTextAreaChange(value, "description")}
               rows={4}
-              placeholder={messages["description_placeholder"] || "Enter description"}
+              placeholder={messages["category_description_placeholder"] || "Enter description"}
             />
           </div>
 
@@ -143,7 +143,7 @@ const AddCategoryComponent: React.FC = () => {
                 name="alt_text"
                 value={form.alt_text}
                 onChange={handleChange}
-                placeholder={messages["alt_text_placeholder_simple"] || "Enter alt text"}
+                placeholder={messages["alt_text_placeholder"] || "enter alt text"}
               />
             </div>
           </div>
@@ -163,7 +163,7 @@ const AddCategoryComponent: React.FC = () => {
                     height={16}
                     className="animate-spin -ml-1 mr-3 !text-white !opacity-100 dark:!invert-0"
                   />
-                  {messages["adding"] || "Creating..."}
+                  {messages["creating"] || "Creating..."}
                 </>
               ) : (
                 messages["create"] || "Create"

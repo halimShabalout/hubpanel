@@ -130,7 +130,7 @@ const EditCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, catego
 
         {success && (
           <div className="mb-4 p-4 rounded-xl border border-success-200 bg-success-50 text-success-700 dark:border-success-700 dark:bg-success-900/20 transition-opacity duration-300">
-            {messages["categories_updated_successfully"] || "Category updated successfully!"}
+            {messages["updated_successfully"] || "Updated Successfully!"}
           </div>
         )}
         {error && (
@@ -143,7 +143,7 @@ const EditCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, catego
           {/* Name */}
           <div>
             <Label htmlFor="name" className={LABEL_CLASS}>
-              {messages["name"] || "Name"}
+              {messages["category_name"] || "Category Name"}
             </Label>
             <InputField
               id="name"
@@ -158,26 +158,26 @@ const EditCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, catego
           {/* Description */}
           <div>
             <Label htmlFor="description" className={LABEL_CLASS}>
-              {messages["description"] || "Description"}
+              {messages["category_description"] || "Category Description"}
             </Label>
             <TextArea
               value={form.description}
               onChange={(value) => handleTextAreaChange(value, "description")}
               rows={5}
-              placeholder={messages["product_category_description_placeholder"] || "Enter category description"}
+              placeholder={messages["category_description_placeholder"] || "enter category description"}
             />
           </div>
 
           {/* Image Upload and Preview */}
           <div>
             <Label className={LABEL_CLASS}>
-              {messages["category_image_label"]?.replace(":", "") || "Category Image"}
+              {messages["category_image"]?.replace(":", "") || "Category Image"}
             </Label>
             <FileInput
               onChange={handleFileChange}
               className="w-full"
               accept="image/*"
-              placeholder={messages["select_image"] || "Choose File"}
+              placeholder={messages["choose_file"] || "Choose File"}
               fileName={form.file ? form.file.name : INITIAL_FILE_NAME}
             />
 
@@ -191,7 +191,7 @@ const EditCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, catego
                 />
               ) : (
                 <div className="w-12 h-12 bg-gray-200 dark:bg-gray-800 rounded-md flex items-center justify-center text-xs text-gray-500">
-                  {messages["no_image"]?.split(".")[0] || "No Img"}
+                  {messages["no_file_chosen"]?.split(".")[0] || "no file chosen"}
                 </div>
               )}
               <div className="flex flex-col min-w-0">
@@ -202,7 +202,7 @@ const EditCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, catego
                     </span>
                   ) : (
                     <span className="text-gray-500 dark:text-gray-400">
-                      {category?.image_url ? (messages["product_main_image"] || "Current Image Set") : (messages["no_image"]?.split(".")[0] || "No Image Set")}
+                      {category?.image_url ? (messages["current_image_set"] || "Current Image Set") : (messages["no_file_chosen"]?.split(".")[0] || "no file chosen")}
                     </span>
                   )}
                 </span>
@@ -226,7 +226,7 @@ const EditCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, catego
               type="text"
               value={form.alt_text}
               onChange={handleChange}
-              placeholder={messages["alt_text_placeholder"] || "Enter alt text for image"}
+              placeholder={messages["alt_text_placeholder"] || "enter alt text"}
             />
           </div>
         </div>

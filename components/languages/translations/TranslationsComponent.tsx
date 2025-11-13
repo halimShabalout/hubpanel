@@ -65,21 +65,21 @@ const TranslationsComponent = () => {
 
       setEditedValues({});
       refetch();
-      setMessage(messages["updated_successfully"]?.replace("Updated", "Translations updated") || "Translations updated successfully!");
+      setMessage(messages["updated_successfully"] || "Updated Successfully!");
       setTimeout(() => setMessage(null), 1000);
     } catch (error) {
       console.error("Update failed:", error);
-      setMessage(messages["error"] || "Error updating translations. Please try again.");
+      setMessage(messages["update_failed"] || "An error occurred while updating.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (isLoading) { <LoadingComponent title={messages["message"] || "translations"} /> }
+  if (isLoading) { <LoadingComponent title={messages["translations"] || "Translations"} /> }
   if (isError)
     return (
       <div className="flex justify-center items-center py-10">
-        <p className="text-red-500">{messages["error"] || "Failed to load translations."}</p>
+        <p className="text-red-500">{messages["loading_failed"] || "An error occurred while loading data."}</p>
       </div>
     );
 
@@ -87,7 +87,7 @@ const TranslationsComponent = () => {
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <TitleComponent title={messages["message"] || "Translations"} />
+        <TitleComponent title={messages["translations"] || "Translations"} />
         <div className="flex items-center gap-2">
           {/* Language Select */}
           <Select
@@ -148,7 +148,7 @@ const TranslationsComponent = () => {
             </div>
           ) : (
             <p className="text-gray-500 dark:text-gray-400">
-              {messages["no_data"] || "No translations found for this language."}
+              {messages["no_data_found"] || "No Data Found!"}
             </p>
           )}
 
@@ -159,7 +159,7 @@ const TranslationsComponent = () => {
               type="submit"
               disabled={loading || Object.keys(editedValues).length === 0}
             >
-              {loading ? (messages["saving"] || "Saving...") : (messages["update"] || "Update")}
+              {loading ? (messages["updating"] || "Updating...") : (messages["update"] || "Update")}
             </Button>
           </div>
         </Form>

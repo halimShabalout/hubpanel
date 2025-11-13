@@ -61,7 +61,7 @@ const LanguagesComponent = () => {
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-3">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {messages["dashboard_total_categories"]?.replace("Categories", "Languages") || "Total"}: {filteredLanguages.length}
+              {messages["total"] || "Total"}: {filteredLanguages.length}
             </p>
             <div className="relative">
               <SearchBar
@@ -71,14 +71,11 @@ const LanguagesComponent = () => {
             </div>
           </div>
 
-          {/* {canAddLang && (
+          {canAddLang && (
             <Button className="h-9 px-4 text-sm" onClick={() => setAddModalOpen(true)}>
-              {messages["add"] || "Add"}
+            {messages["create"] || "Create"}
             </Button>
-          )} */}
-          <Button className="h-9 px-4 text-sm" onClick={() => setAddModalOpen(true)}>
-            {messages["add"] || "Add"}
-          </Button>
+          )}
         </div>
       </div>
 
@@ -88,11 +85,11 @@ const LanguagesComponent = () => {
           <div className="min-w-[600px]">
             <Table>
               <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                  <TableRow>
-                  <Th> {messages["name"] || "Name"} </Th>
-                  <Th> {messages["code"] || "Code"} </Th>
-                  <Th> {messages["default"] || "Default"} </Th>
-                  <Th> {messages["action"] || "Actions"}</Th>
+                <TableRow>
+                  <Th> {messages["language_name"] || "Language Name"} </Th>
+                  <Th> {messages["language_code"] || "Language Code"} </Th>
+                  <Th> {messages["language_default"] || "Default Language"} </Th>
+                  <Th> {messages["actions"] || "Actions"}</Th>
                 </TableRow>
               </TableHeader>
 
@@ -120,13 +117,13 @@ const LanguagesComponent = () => {
                       <Td>
                         <div className="flex items-center">
                           {canEditLang && (
-                            <Button  size="icon" variant="ghost" onClick={() => openEditModal(lang)} >
-                            <PencilIcon width={20} height={20} />
+                            <Button size="icon" variant="ghost" onClick={() => openEditModal(lang)} >
+                              <PencilIcon width={20} height={20} />
                             </Button>
                           )}
                           {canDeleteLang && (
                             <Button size="icon" variant="ghost" onClick={() => openDeleteModal(lang)} >
-                            <TrashBinIcon width={20} height={20} />
+                              <TrashBinIcon width={20} height={20} />
                             </Button>
                           )}
                         </div>
@@ -139,7 +136,7 @@ const LanguagesComponent = () => {
                       colSpan={4}
                       className="px-5 py-6 text-center text-gray-500 dark:text-gray-400"
                     >
-                      {messages["no_data"] || "No languages found."}
+                      {messages["no_data"] || "No Data Found!"}
                     </td>
                   </TableRow>
                 )}

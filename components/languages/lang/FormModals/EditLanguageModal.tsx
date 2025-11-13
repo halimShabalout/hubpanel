@@ -80,7 +80,7 @@ const EditLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, langua
 
     try {
       await updateLanguage.mutateAsync({ id: language.id, data: payload });
-      setMessage(messages["user_updated_successfully"]?.replace("User", "Language") || "Language updated successfully!");
+      setMessage(messages["updated_successfully"]?.replace("User", "Language") || "Updated Successfully!");
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -88,7 +88,7 @@ const EditLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, langua
       onSuccess();
     } catch (err) {
       console.error(err);
-      setMessage(messages["error"] || "Error updating language. Please try again.");
+      setMessage(messages["update_failed"] || "An error occurred while updating.");
     }
   };
 
@@ -120,24 +120,24 @@ const EditLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, langua
         <div className="space-y-5">
           {/* Code */}
           <div>
-            <Label>{messages["code"] || "Language Code"}</Label>
+            <Label>{messages["language_code"] || "Language Code"}</Label>
             <InputField
               type="text"
               value={form.code}
               onChange={(e) => handleChange("code", e.target.value)}
-              placeholder={messages["code_placeholder"] || "Enter code (e.g. en, ar)"}
+              placeholder={messages["language_code_placeholder"] || "enter language code (e.g. en, ar)"}
               required
             />
           </div>
 
           {/* Name */}
           <div>
-            <Label>{messages["name"] || "Language Name"}</Label>
+            <Label>{messages["language_name"] || "Language Name"}</Label>
             <InputField
               type="text"
               value={form.name}
               onChange={(e) => handleChange("name", e.target.value)}
-              placeholder={messages["name_placeholder"] || "Enter name (e.g. English, Arabic)"}
+              placeholder={messages["language_name_placeholder"] || "enter language name (e.g. English, Arabic)"}
               required
             />
           </div>
@@ -152,7 +152,7 @@ const EditLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, langua
               className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600"
             />
             <Label htmlFor="isDefaultEdit" className="ml-2 mb-0 cursor-pointer">
-              {messages["set_as_default"] || "Set as Default Language"}
+              {messages["set_as_default"] || "Set as Default"}
             </Label>
           </div>
         </div>
@@ -167,7 +167,7 @@ const EditLanguageModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, langua
             type="submit"
             disabled={isPending || !isModified || areFieldsEmpty}
           >
-            {isPending ? (messages["edit_profile_modal_loading"]?.replace("profile", "language") || "Updating...") : (messages["update"] || "Update")}
+            {isPending ? (messages["updating"] || "Updating...") : (messages["update"] || "Update")}
           </Button>
         </div>
       </Form>

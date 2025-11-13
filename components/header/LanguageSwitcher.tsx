@@ -74,7 +74,7 @@ export default function LanguageDropdown() {
             {isLoading ? (
               <li className="px-4 py-2 text-sm dark:text-white">{messages["loading"] || "Loading..."}</li>
             ) : languages.length === 0 ? (
-              <li className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">{messages["no_data"] || "No languages"}</li>
+              <li className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">{messages["no_languages"] || "No languages"}</li>
             ) : (
               languages.map(({ code, name }) => (
                 <li key={code}>

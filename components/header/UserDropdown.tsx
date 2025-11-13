@@ -176,7 +176,7 @@ const UserDropdown = () => {
               fill=""
             />
           </svg>
-          {messages["sign-out"] || "Sign Out"}
+          {messages["sign_out"] || "Sign Out"}
         </button>
       </Dropdown>
     </div>

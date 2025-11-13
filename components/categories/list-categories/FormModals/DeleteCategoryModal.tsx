@@ -37,7 +37,7 @@ const DeleteCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, cate
       isOpen={isOpen}
       onClose={onClose}
       onConfirm={handleDeleteCategory}
-      title={messages["confirm_delete"] || "Confirm Category Deletion"}
+      title={messages["confirm_delete"] || "Confirm Deletion"}
       message={
         <>
           {messages["delete_warning"] 
@@ -46,7 +46,7 @@ const DeleteCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, cate
           }
         </>
       }
-      errorMessage={messages["delete_failed"] || "Error deleting category. This category might be in use or protected."}
+      errorMessage={messages["delete_failed"] || "An error occurred while deleting."}
     />
   );
 };
