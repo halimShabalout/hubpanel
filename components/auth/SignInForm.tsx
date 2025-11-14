@@ -75,12 +75,12 @@ export default function SignInForm() {
           {/* Email */}
           <div>
             <Label>
-              {messages["signin_email"] || "Email"}{" "}
+              {messages["email"] || "Email"}{" "}
               <span className="text-error-500">*</span>
             </Label>
             <Input
               type="email"
-              placeholder="info@gmail.com"
+              placeholder={messages["email_placeholder"] || "info@gmail.com"}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -90,15 +90,15 @@ export default function SignInForm() {
           {/* Password */}
           <div>
             <Label>
-              {messages["signin_password"] || "Password"}{" "}
+              {messages["password"] || "Password"}{" "}
               <span className="text-error-500">*</span>
             </Label>
             <div className="relative">
               <Input
                 type={showPassword ? "text" : "password"}
                 placeholder={
-                  messages["signin_password_placeholder"] ||
-                  "Enter your password"
+                  messages["password_placeholder"] ||
+                  "enter your password"
                 }
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -110,7 +110,7 @@ export default function SignInForm() {
                 className={`absolute top-1/2 -translate-y-1/2 z-10 ${
                   isRtl ? "left-4" : "right-4"
                 }`}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={showPassword ? (messages["hide_password"] || "Hide password") : (messages["show_password"] || "Show password")}
               >
                 {showPassword ? (
                   <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
@@ -133,7 +133,7 @@ export default function SignInForm() {
               href="/reset-password"
               className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
             >
-              {messages["signin_forgot_password"] || "Forgot password?"}
+              {messages["forgot_password"] || "Forgot your password?"}
             </Link>
           </div>
 
@@ -146,14 +146,14 @@ export default function SignInForm() {
               disabled={isPending}
             >
               {isPending
-                ? messages["signin_loading"] || "Loading..."
+                ? messages["loading"] || "Loading..."
                 : messages["signin_button"] || "Sign In"}
             </Button>
 
             {/* Error message */}
             {errorMessage && (
               <p className="mt-2 text-sm text-red-500 text-center">
-                {errorMessage === "Invalid credentials"
+                {errorMessage === "Invalid credentials" || errorMessage.includes("Invalid")
                   ? messages["signin_error_invalid"] ||
                     "Invalid email or password"
                   : errorMessage}

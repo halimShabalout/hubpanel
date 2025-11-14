@@ -14,8 +14,10 @@ import DeleteLanguageModal from "./FormModals/DeleteLanguageModal";
 import LoadingComponent from "@/components/ui/LoadingComponent";
 import TitleComponent from "@/components/ui/TitleComponent";
 import SearchBar from "@/components/form/input/SearchBar";
+import { useLocale } from "@/context/LocaleContext";
 
 const LanguagesComponent = () => {
+  const { messages } = useLocale();
   const [selectedLang, setSelectedLang] = useState<any | null>(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -59,7 +61,7 @@ const LanguagesComponent = () => {
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-3">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Total: {filteredLanguages.length}
+              {messages["total"] || "Total"}: {filteredLanguages.length}
             </p>
             <div className="relative">
               <SearchBar
@@ -69,14 +71,11 @@ const LanguagesComponent = () => {
             </div>
           </div>
 
-          {/* {canAddLang && (
+          {canAddLang && (
             <Button className="h-9 px-4 text-sm" onClick={() => setAddModalOpen(true)}>
-              Add
+            {messages["create"] || "Create"}
             </Button>
-          )} */}
-          <Button className="h-9 px-4 text-sm" onClick={() => setAddModalOpen(true)}>
-            Add
-          </Button>
+          )}
         </div>
       </div>
 
@@ -86,11 +85,11 @@ const LanguagesComponent = () => {
           <div className="min-w-[600px]">
             <Table>
               <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                  <TableRow>
-                  <Th> Name </Th>
-                  <Th> Code </Th>
-                  <Th> Default </Th>
-                  <Th> Actions</Th>
+                <TableRow>
+                  <Th> {messages["language_name"] || "Language Name"} </Th>
+                  <Th> {messages["language_code"] || "Language Code"} </Th>
+                  <Th> {messages["language_default"] || "Default Language"} </Th>
+                  <Th> {messages["action"] || "Action"}</Th>
                 </TableRow>
               </TableHeader>
 
@@ -107,24 +106,24 @@ const LanguagesComponent = () => {
                       <Td>
                         {lang.isDefault ? (
                           <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                            Yes
+                            {messages["yes"] || "Yes"}
                           </span>
                         ) : (
                           <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800/30 dark:text-gray-500">
-                            No
+                            {messages["no"] || "No"}
                           </span>
                         )}
                       </Td>
                       <Td>
                         <div className="flex items-center">
                           {canEditLang && (
-                            <Button  size="icon" variant="ghost" onClick={() => openEditModal(lang)} >
-                            <PencilIcon width={20} height={20} />
+                            <Button size="icon" variant="ghost" onClick={() => openEditModal(lang)} >
+                              <PencilIcon width={20} height={20} />
                             </Button>
                           )}
                           {canDeleteLang && (
                             <Button size="icon" variant="ghost" onClick={() => openDeleteModal(lang)} >
-                            <TrashBinIcon width={20} height={20} />
+                              <TrashBinIcon width={20} height={20} />
                             </Button>
                           )}
                         </div>
@@ -137,7 +136,7 @@ const LanguagesComponent = () => {
                       colSpan={4}
                       className="px-5 py-6 text-center text-gray-500 dark:text-gray-400"
                     >
-                      No languages found.
+                      {messages["no_data"] || "No Data Found!"}
                     </td>
                   </TableRow>
                 )}
