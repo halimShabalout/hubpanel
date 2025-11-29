@@ -20,6 +20,7 @@ export interface Product {
   stockQuantity: number;
   isActive: boolean;
   isFeatured: boolean;
+  priority: number;
   createdAt: string;
   updatedAt: string;
   Images: ProductImage[];

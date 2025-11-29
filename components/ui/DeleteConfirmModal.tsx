@@ -3,39 +3,45 @@
 import React, { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
-import { LoadingIcon } from "../../icons"; 
+import { LoadingIcon } from "../../icons";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => Promise<void>;
   title: string;
-  message: React.ReactNode; 
-  errorMessage?: string; 
+  message: React.ReactNode;
+  errorMessage?: string;
+  successMessage?: string;
 }
 
-const DeleteConfirmModal: React.FC<Props> = ({ 
-  isOpen, 
-  onClose, 
-  onConfirm, 
-  title, 
-  message, 
-  errorMessage = "An error occurred while deleting. Please try again." 
+const DeleteConfirmModal: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  errorMessage = "An error occurred while deleting. Please try again.",
+  successMessage
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const [error, setError] = useState<boolean>(false);
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleDelete = async () => {
     setIsDeleting(true);
     setError(false);
+    setSuccess(false);
 
     try {
       await onConfirm();
-      onClose();
+      setSuccess(true);
+      setTimeout(() => {
+        setIsDeleting(false);
+        onClose();
+      }, 1000);
     } catch (e) {
-      console.error("Deletion failed:", e);
       setError(true);
-    } finally {
       setIsDeleting(false);
     }
   };
@@ -43,6 +49,7 @@ const DeleteConfirmModal: React.FC<Props> = ({
   const handleClose = () => {
     if (!isDeleting) {
       setError(false);
+      setSuccess(false);
       onClose();
     }
   };
@@ -54,9 +61,13 @@ const DeleteConfirmModal: React.FC<Props> = ({
           {title}
         </h4>
 
-        <p className="text-sm leading-6 text-gray-600 dark:text-gray-300">
-          {message}
-        </p>
+        {success && successMessage && (
+          <div className="mb-2 p-3 rounded-lg border border-green-200 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-900/30 dark:text-green-300 text-sm">
+            {successMessage}
+          </div>
+        )}
+
+        <div className="text-sm leading-6 text-gray-600 dark:text-gray-300">{message}</div>
 
         {error && (
           <div className="mt-4 p-3 rounded-xl border border-error-200 bg-error-50 text-error-700 dark:border-error-700 dark:bg-error-900/20 text-xs">
@@ -71,7 +82,7 @@ const DeleteConfirmModal: React.FC<Props> = ({
         </Button>
         <Button
           size="sm"
-          disabled={isDeleting}
+          disabled={isDeleting || success}
           className={
             isDeleting
               ? "bg-red-700 opacity-75 cursor-not-allowed flex items-center justify-center text-white"

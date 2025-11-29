@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 interface FormState {
   name: string;
   description: string;
-  isFeatured: boolean;
+  priority: number;
 }
 
 const AddCategoryComponent: React.FC = () => {
@@ -27,16 +27,17 @@ const AddCategoryComponent: React.FC = () => {
   const [form, setForm] = useState<FormState>({
     name: "",
     description: "",
-    isFeatured: false,
+    priority: 0,
   });
+
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("No file chosen");
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     if (!success) {
-      setForm({ name: "", description: "", isFeatured: false });
+      setForm({ name: "", description: "", priority: 0 });
       setFile(null);
       setFileName("No file chosen");
       setMessage(null);
@@ -45,10 +46,11 @@ const AddCategoryComponent: React.FC = () => {
 
   // Handlers
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, type, checked, value } = e.target;
+    const { name, value, type } = e.target;
+
     setForm(prev => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "number" ? Number(value) : value,
     }));
   };
 
@@ -67,7 +69,7 @@ const AddCategoryComponent: React.FC = () => {
     setMessage(null);
 
     if (!file) {
-      setMessage(messages["required_fields_error"] || "Please choose an image.");
+      setMessage({ text: messages["required_fields_error"] || "Please choose an image.", type: "error" });
       return;
     }
 
@@ -75,12 +77,12 @@ const AddCategoryComponent: React.FC = () => {
       const formData = new FormData();
       formData.append("name", form.name.trim());
       formData.append("description", form.description.trim());
-      formData.append("isFeatured", String(form.isFeatured));
-      formData.append("imageUrl", file); // ← تم تعديل اسم الحقل
+      formData.append("priority", String(form.priority));
+      formData.append("imageUrl", file);
 
       await createCategoryMutation.mutateAsync(formData);
 
-      setMessage(messages["created_successfully"] || "Created Successfully!");
+      setMessage({ text: messages["created_successfully"] || "Created Successfully!", type: "success" });
       setSuccess(true);
 
       setTimeout(() => {
@@ -90,7 +92,7 @@ const AddCategoryComponent: React.FC = () => {
 
     } catch (err) {
       console.error(err);
-      setMessage(messages["error"] || "An error occurred while creating.");
+      setMessage({ text: messages["error"] || "An error occurred while creating.", type: "error" });
     }
   };
 
@@ -105,16 +107,17 @@ const AddCategoryComponent: React.FC = () => {
 
       <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03] lg:p-8 space-y-6">
         {message && (
-          <div className={`p-4 rounded-xl border transition-opacity duration-300 ${
-            message.includes("successfully") || message.includes("Successfully")
-              ? "border-success-200 bg-success-50 text-success-700 dark:border-success-700 dark:bg-success-900/20"
-              : "border-error-200 bg-error-50 text-error-700 dark:border-error-700 dark:bg-error-900/20"
-          }`}>
-            {message}
+          <div className={`p-4 rounded-xl border transition-opacity duration-300 ${message.type === "success"
+            ? "border-success-200 bg-success-50 text-success-700 dark:border-success-700 dark:bg-success-900/20"
+            : "border-error-200 bg-error-50 text-error-700 dark:border-error-700 dark:bg-error-900/20"
+            }`}>
+            {message.text}
           </div>
         )}
 
         <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+          {/* NAME */}
           <div>
             <Label htmlFor="name" className={LABEL_CLASS}>
               {messages["category_name"] || "Category Name"} <span className="text-error-500">*</span>
@@ -129,6 +132,7 @@ const AddCategoryComponent: React.FC = () => {
             />
           </div>
 
+          {/* DESCRIPTION */}
           <div>
             <Label htmlFor="description" className={LABEL_CLASS}>
               {messages["category_description"] || "Description"}
@@ -141,7 +145,10 @@ const AddCategoryComponent: React.FC = () => {
             />
           </div>
 
+          {/* IMAGE + PRIORITY */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* IMAGE INPUT */}
             <div className="space-y-1">
               <Label htmlFor="file" className={LABEL_CLASS}>
                 {messages["category_image"] || "Category Image"} <span className="text-error-500">*</span>
@@ -156,21 +163,25 @@ const AddCategoryComponent: React.FC = () => {
               />
             </div>
 
-            <div className="flex flex-col justify-between">
-              <Label htmlFor="isFeatured" className={LABEL_CLASS}>
-                {messages["is_featured"] || "Is Featured"}
+            {/* PRIORITY INPUT */}
+            <div className="space-y-1">
+              <Label htmlFor="priority" className={LABEL_CLASS}>
+                {messages["priority"] || "Priority"} <span className="text-error-500">*</span>
               </Label>
-              <input
-                type="checkbox"
-                id="isFeatured"
-                name="isFeatured"
-                checked={form.isFeatured}
+              <InputField
+                id="priority"
+                name="priority"
+                type="number"
+                min={0}
+                value={form.priority}
                 onChange={handleChange}
-                className="w-5 h-5"
+                
               />
             </div>
+
           </div>
 
+          {/* SUBMIT BUTTON */}
           <div className="mt-6 flex justify-end gap-3">
             <Button
               type="submit"

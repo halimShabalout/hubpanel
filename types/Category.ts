@@ -14,7 +14,7 @@ export interface Category {
   name: string;
   description: string;
   imageUrl?: string | null;
-  isFeatured: boolean;
+  priority: number;
   createdAt: string;
   updatedAt: string;
   translated?: CategoryTranslated;

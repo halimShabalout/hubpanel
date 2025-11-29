@@ -1,16 +1,16 @@
 "use client";
 import { useParams, useSearchParams } from "next/navigation";
-import CategoryProducts from "@/components/categories/category-products/CategoryProducts";
+import ProductsComponent from "@/components/products/list-products/ProductsComponent";
 
 export default function CategoryProductsPage() {
   const params = useParams();
   const searchParams = useSearchParams();
-  const categoryId = params?.id ? parseInt(params.id as string) : 0;
+  const categoryId = params?.id ? parseInt(params.id as string) : undefined;
   const categoryName = searchParams?.get("name") || "";
 
   return (
-    <div className="p-6">
-      <CategoryProducts 
+    <div className="space-y-6">
+      <ProductsComponent 
         categoryId={categoryId}
         categoryName={categoryName}
       />

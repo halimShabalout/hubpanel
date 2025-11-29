@@ -11,7 +11,7 @@ import { useHasPermission } from "@/hooks/useAuth";
 import { PERMISSIONS } from "@/types/Permissions";
 import TitleComponent from "@/components/ui/TitleComponent";
 import { useLocale } from "@/context/LocaleContext";
-import { useAllCategories } from "@/hooks/useCategory"; 
+import { useAllCategories } from "@/hooks/useCategory";
 import { Category } from "@/types/Category";
 
 const CategoriesComponent: React.FC = () => {
@@ -27,7 +27,7 @@ const CategoriesComponent: React.FC = () => {
 
   const { data: categoriesResponse, isLoading, refetch } = useAllCategories(locale);
   const categories = categoriesResponse?.data || [];
-    const router = useRouter();
+  const router = useRouter();
   // ---------------- Handlers ----------------
   const handleDropdownToggle = (categoryId: number) => {
     setOpenDropdownId(prev => (prev === categoryId ? null : categoryId));
@@ -77,7 +77,9 @@ const CategoriesComponent: React.FC = () => {
                   category.translated?.name || category.name || ""
                 )}`
               )
-            }            onEdit={canEditCategory ? () => handleOpenEditModal(category) : undefined}
+            }
+
+            onEdit={canEditCategory ? () => handleOpenEditModal(category) : undefined}
             onDelete={canDeleteCategory ? () => handleOpenDeleteModal(category) : undefined}
           />
         ))}
