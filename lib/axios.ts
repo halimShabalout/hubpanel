@@ -42,7 +42,7 @@ apiClient.interceptors.response.use(
       const url = error.config?.url || "";
 
       if (status === 401 && !url.includes("/auth/login")) {
-        console.warn("🔒 Unauthorized — redirecting to signin...");
+        console.warn("Unauthorized — redirecting to signin...");
         localStorage.removeItem("accessToken");
         localStorage.removeItem("userId");
         if (typeof window !== "undefined") {

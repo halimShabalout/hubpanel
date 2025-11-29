@@ -25,7 +25,7 @@ interface FormState {
   name: string;
   description: string;
   file: File | null;
-  isFeatured: boolean;
+  priority: number;
 }
 
 const EditCategoryModal: React.FC<Props> = ({
@@ -41,24 +41,25 @@ const EditCategoryModal: React.FC<Props> = ({
     name: "",
     description: "",
     file: null,
-    isFeatured: false
+    priority: 0
   });
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
     if (category && isOpen) {
+
       const translatedName = category.translated?.name || category.name || "";
       const translatedDescription = category.translated?.description || category.description || "";
-      const imageUrl = category.imageUrl ||  null;
-      
+      const imageUrl = category.imageUrl || null;
+
       setForm({
         name: translatedName,
         description: translatedDescription,
         file: null,
-        isFeatured: category.isFeatured
+        priority: category.priority || 0
       });
 
       if (imageUrl) {
@@ -67,14 +68,15 @@ const EditCategoryModal: React.FC<Props> = ({
       } else {
         setPreviewUrl(null);
       }
+
       setMessage(null);
+
     } else if (!isOpen) {
-      // تنظيف الحالة عند إغلاق المودال
       setForm({
         name: "",
         description: "",
         file: null,
-        isFeatured: false
+        priority: 0
       });
       setPreviewUrl(null);
       setMessage(null);
@@ -82,22 +84,22 @@ const EditCategoryModal: React.FC<Props> = ({
   }, [category, isOpen]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
 
-    setForm((prev) => ({
+    setForm(prev => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value
+      [name]: name === "priority" ? Number(value) : value
     }));
   };
 
   const handleTextAreaChange = (value: string) => {
-    setForm((prev) => ({ ...prev, description: value }));
+    setForm(prev => ({ ...prev, description: value }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
 
-    setForm((prev) => ({ ...prev, file: selectedFile }));
+    setForm(prev => ({ ...prev, file: selectedFile }));
 
     if (selectedFile) {
       const url = URL.createObjectURL(selectedFile);
@@ -117,8 +119,8 @@ const EditCategoryModal: React.FC<Props> = ({
       const formData = new FormData();
       formData.append("name", form.name.trim());
       formData.append("description", form.description.trim());
-      formData.append("isFeatured", String(form.isFeatured));
-      
+      formData.append("priority", String(form.priority));
+
       if (form.file) {
         formData.append("imageUrl", form.file);
       }
@@ -129,14 +131,15 @@ const EditCategoryModal: React.FC<Props> = ({
         lang: locale
       });
 
-      setMessage(messages["updated_successfully"] || "Updated successfully!");
+      setMessage({ text: messages["updated_successfully"] || "Updated successfully!", type: "success" });
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       onClose();
       if (onSuccess) onSuccess();
+
     } catch (err) {
-      setMessage(messages["update_failed"] || "Update failed.");
+      setMessage({ text: messages["update_failed"] || "Update failed.", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -147,18 +150,13 @@ const EditCategoryModal: React.FC<Props> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-8">
       <Form onSubmit={handleSubmit}>
-        <TitleComponent
-          title={messages["edit_product_category"] || "Edit Category"}
-          className="text-center mb-6"
-        />
-
+        <TitleComponent title={messages["edit_product_category"] || "Edit Category"} className="text-center mb-6" />
         {message && (
-          <div className={`p-4 rounded-xl border mb-4 ${
-            message.includes("successfully") || message.includes("Updated")
-              ? "border-success-200 bg-success-50 text-success-700 dark:border-success-700 dark:bg-success-900/20"
-              : "border-error-200 bg-error-50 text-error-700 dark:border-error-700 dark:bg-error-900/20"
-          }`}>
-            {message}
+          <div className={`p-4 rounded-xl border transition-opacity duration-300 ${message.type === "success"
+            ? "border-success-200 bg-success-50 text-success-700 dark:border-success-700 dark:bg-success-900/20"
+            : "border-error-200 bg-error-50 text-error-700 dark:border-error-700 dark:bg-error-900/20"
+            }`}>
+            {message.text}
           </div>
         )}
 
@@ -173,37 +171,24 @@ const EditCategoryModal: React.FC<Props> = ({
 
         {/* Description */}
         <Label className={LABEL}>{messages["category_description"]}</Label>
-        <TextArea
-          value={form.description}
-          onChange={handleTextAreaChange}
-          rows={4}
-        />
+        <TextArea value={form.description} onChange={handleTextAreaChange} rows={4} />
 
-        {/* isFeatured */}
-        <div className="flex items-center gap-2 mt-3">
-          <input
-            id="isFeatured"
-            type="checkbox"
-            name="isFeatured"
-            checked={form.isFeatured}
-            onChange={handleChange}
-            className="w-4 h-4"
-          />
-          <Label htmlFor="isFeatured" className={LABEL}>
-            {messages["featured"] || "Featured"}
-          </Label>
-        </div>
+        {/* Priority */}
+        <Label className={LABEL}>{messages["priority"] || "Priority"}</Label>
+        <InputField
+          type="number"
+          name="priority"
+          value={form.priority}
+          onChange={handleChange}
+          placeholder={messages["enter_priority"] || "Enter priority"}
+        />
 
         {/* Image */}
         <Label className={LABEL}>{messages["category_image"]}</Label>
         <FileInput onChange={handleFileChange} accept="image/*" />
 
         {previewUrl && (
-          <img
-            src={previewUrl}
-            alt="preview"
-            className="w-20 h-20 rounded mt-2 object-cover"
-          />
+          <img src={previewUrl} alt="preview" className="w-20 h-20 rounded mt-2 object-cover" />
         )}
 
         {/* Buttons */}

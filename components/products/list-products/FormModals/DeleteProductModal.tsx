@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import DeleteConfirmModal from "@/components/ui/DeleteConfirmModal";
 import { useLocale } from "@/context/LocaleContext";
 import { Product } from "@/types/Product";
@@ -16,26 +16,46 @@ interface Props {
 const DeleteProductModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, product }) => {
   const { messages } = useLocale();
   const deleteProductMutation = useDeleteProduct();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Get product name and id - support both new Product type and legacy format
-  const productName = product && 'translated' in product 
-    ? product.translated?.name 
+  const productName = product && 'translated' in product
+    ? product.translated?.name
     : (product as { name?: string })?.name || "";
 
-  const productId = product && 'id' in product ? product.id : undefined;
+
+  useEffect(() => {
+    if (!isOpen) {
+      setErrorMessage(null);
+      setSuccessMessage(null);
+    }
+  }, [isOpen]);
 
   const handleDeleteProduct = async (): Promise<void> => {
-    if (!productId) {
-      throw new Error("Product ID is required");
-    }
+    if (!product?.id) return;
 
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    
     try {
-      await deleteProductMutation.mutateAsync(productId);
-      if (onSuccess) onSuccess();
-    } catch (error: any) {
-      throw new Error(error?.response?.data?.message || "Failed to delete product");
+      await deleteProductMutation.mutateAsync(product.id);
+      const successMsg = messages["delete_successfully"] || "Deleted successfully!";
+      setSuccessMessage(successMsg);
+      onSuccess?.();
+    } catch (err) {
+      setErrorMessage(messages["delete_failed"] || "An error occurred while deleting.");
+      throw err;
     }
   };
+
+  const messageContent = messages["delete_warning"] ? (
+    <>
+      {messages["delete_warning"]} <strong>{productName}</strong>?
+    </>
+  ) : (
+    `Are you sure you want to delete "${productName}"? This action cannot be undone.`
+  );
 
   return (
     <DeleteConfirmModal
@@ -43,15 +63,9 @@ const DeleteProductModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, produ
       onClose={onClose}
       onConfirm={handleDeleteProduct}
       title={messages["confirm_delete"] || "Confirm Product Deletion"}
-      message={
-        <>
-          {messages["delete_warning"] 
-            ? messages["delete_warning"].replace("{name}", productName || "")
-            : <>Are you sure you want to delete <strong>"{productName}"</strong>? This action cannot be undone.</>
-          }
-        </>
-      }
-      errorMessage={messages["delete_failed"] || "Error deleting product. The product may be linked to active orders."}
+      message={messageContent}
+      errorMessage={errorMessage || messages["delete_failed"] || "An error occurred while deleting."}
+      successMessage={successMessage || undefined}
     />
   );
 };

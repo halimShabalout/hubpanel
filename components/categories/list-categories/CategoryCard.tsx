@@ -68,6 +68,9 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
               <p className="text-sm font-medium text-blue-600 dark:text-blue-400 truncate">
                 {messages["product_count"] || "Product Count"}: {productCount}
               </p>
+              <p className="text-sm font-medium text-purple-600 dark:text-purple-400 truncate">
+                {messages["priority"] || "Priority"}: {category.priority}
+              </p>
             </div>
 
             <div className="relative flex-shrink-0">

@@ -23,9 +23,12 @@ interface FormState {
   is_active: boolean;
   is_featured: boolean;
   category_id: string;
+  priority: number;
 }
-
-const AddProductComponent: React.FC = () => {
+interface AddProductComponentProps {
+  preselectedCategoryId?: string;
+}
+const AddProductComponent: React.FC<AddProductComponentProps> = ({ preselectedCategoryId }) => {
   const router = useRouter();
   const { messages, locale } = useLocale();
   const [form, setForm] = useState<FormState>({
@@ -35,7 +38,8 @@ const AddProductComponent: React.FC = () => {
     stock_quantity: 0,
     is_active: true,
     is_featured: false,
-    category_id: "",
+    category_id: preselectedCategoryId || "",
+    priority: 0,
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -48,6 +52,12 @@ const AddProductComponent: React.FC = () => {
     value: cat.id.toString(),
     label: cat.translated?.name || cat.name || "",
   }));
+
+  useEffect(() => {
+    if (preselectedCategoryId) {
+      setForm(prev => ({ ...prev, category_id: preselectedCategoryId }));
+    }
+  }, [preselectedCategoryId]);
 
   useEffect(() => {
     if (successMessage) {
@@ -69,7 +79,7 @@ const AddProductComponent: React.FC = () => {
     if (typeof e === 'string' && name) {
       setForm((prev) => ({
         ...prev,
-        [name]: name === 'stock_quantity' ? Number(e) : e,
+        [name]: name === 'stock_quantity' || name === 'priority' ? Number(e) : e,
       }));
       return;
     }
@@ -120,6 +130,7 @@ const AddProductComponent: React.FC = () => {
       is_active: true,
       is_featured: false,
       category_id: "",
+      priority: 0,
     });
   }
 
@@ -146,18 +157,18 @@ const AddProductComponent: React.FC = () => {
     try {
       await createProduct.mutateAsync({
         name: form.name.trim(),
-        slug: form.slug.trim(), 
+        slug: form.slug.trim(),
         description: form.description.trim() || undefined,
         stockQuantity: form.stock_quantity,
         isActive: form.is_active,
         isFeatured: form.is_featured,
         categoryId: form.category_id ? Number(form.category_id) : undefined,
+        priority: form.priority,
       });
 
       setSuccessMessage(messages["created_successfully"] || "Product created successfully!");
       resetForm();
 
-      // Redirect to products list after 1.5 seconds
       setTimeout(() => {
         router.push("/products/list-products");
       }, 1500);
@@ -189,11 +200,8 @@ const AddProductComponent: React.FC = () => {
 
         <Form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-          {/* Category */}
           <div>
-            <Label
-              className="text-md text-gray-800 dark:text-white/90"
-            >
+            <Label className="text-md text-gray-800 dark:text-white/90">
               {messages["product_category_name"] || "Category Name"} <span className="text-red-600">*</span>
             </Label>
             <Select
@@ -206,7 +214,6 @@ const AddProductComponent: React.FC = () => {
             />
           </div>
 
-          {/* Name */}
           <InputField
             id="name"
             name="name"
@@ -217,7 +224,7 @@ const AddProductComponent: React.FC = () => {
             required
             disabled={createProduct.isPending}
           />
-          {/* Slug */}
+
           <InputField
             id="slug"
             name="slug"
@@ -229,12 +236,8 @@ const AddProductComponent: React.FC = () => {
             disabled={createProduct.isPending}
           />
 
-          {/* Description */}
           <div>
-            <Label
-              htmlFor="description"
-              className="text-md text-gray-800 dark:text-white/90"
-            >
+            <Label htmlFor="description" className="text-md text-gray-800 dark:text-white/90">
               {messages["product_description"] || "Product Description"}
             </Label>
             <TextArea
@@ -246,7 +249,6 @@ const AddProductComponent: React.FC = () => {
             />
           </div>
 
-          {/* Stock Quantity */}
           <InputField
             id="stock_quantity"
             name="stock_quantity"
@@ -260,7 +262,17 @@ const AddProductComponent: React.FC = () => {
             disabled={createProduct.isPending}
           />
 
-          {/* Checkboxes */}
+          <InputField
+            id="priority"
+            name="priority"
+            type="number"
+            label={messages["product_priority"] || "Priority"}
+            value={form.priority}
+            onChange={handleChange}
+            min={0}
+            required
+          />
+
           <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0">
             <Checkbox
               id="is_active"
@@ -279,7 +291,6 @@ const AddProductComponent: React.FC = () => {
             />
           </div>
 
-          {/* Submit */}
           <div className="flex justify-end">
             <Button
               type="submit"

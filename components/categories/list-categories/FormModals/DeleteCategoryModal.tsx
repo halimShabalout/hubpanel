@@ -13,42 +13,45 @@ interface Props {
   category?: Category | null;
 }
 
-const DeleteCategoryModal: React.FC<Props> = ({
-  isOpen,
-  onClose,
-  onSuccess,
-  category,
-}) => {
+const DeleteCategoryModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, category }) => {
   const { messages } = useLocale();
   const deleteCategory = useDeleteCategory();
-  const [message, setMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) {
-      setMessage(null);
+      setErrorMessage(null);
+      setSuccessMessage(null);
     }
   }, [isOpen]);
 
   const handleDeleteCategory = async (): Promise<void> => {
     if (!category?.id) return;
-    
-    setMessage(null);
+
+    setErrorMessage(null);
+    setSuccessMessage(null);
 
     try {
       await deleteCategory.mutateAsync(category.id);
-      // تعيين رسالة النجاح بعد إتمام الحذف
       const successMsg = messages["delete_successfully"] || "Deleted successfully!";
-      setMessage(successMsg);
+      setSuccessMessage(successMsg);
       onSuccess?.();
     } catch (err) {
-      console.error(err);
-      setMessage(messages["delete_failed"] || "An error occurred while deleting.");
-      throw err; // إعادة throw الخطأ حتى يعرض DeleteConfirmModal رسالة الخطأ
+      setErrorMessage(messages["delete_failed"] || "An error occurred while deleting.");
+      throw err;
     }
   };
 
-  // الحصول على اسم الفئة للعرض
   const categoryName = category?.translated?.name || category?.name || "this category";
+
+  const messageContent = messages["delete_warning"] ? (
+    <>
+      {messages["delete_warning"]} <strong>{categoryName}</strong>?
+    </>
+  ) : (
+    `Are you sure you want to delete "${categoryName}"? This action cannot be undone.`
+  );
 
   return (
     <DeleteConfirmModal
@@ -56,15 +59,9 @@ const DeleteCategoryModal: React.FC<Props> = ({
       onClose={onClose}
       onConfirm={handleDeleteCategory}
       title={messages["confirm_delete"] || "Confirm Deletion"}
-      message={
-        <>
-          {messages["delete_warning"]
-            ? messages["delete_warning"].replace("{name}", categoryName)
-            : <>Are you sure you want to delete <strong>"{categoryName}"</strong>? This action cannot be undone.</>
-          }
-        </>
-      }
-      errorMessage={messages["delete_failed"] || "An error occurred while deleting."}
+      message={messageContent}
+      errorMessage={errorMessage || messages["delete_failed"] || "An error occurred while deleting."}
+      successMessage={successMessage || undefined}
     />
   );
 };
