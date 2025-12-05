@@ -27,11 +27,17 @@ const HomeSliderCard: React.FC<Props> = ({ slider, openDropdownId, onDropdownTog
   const isRtl = locale === "ar";
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+    <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
       <CardContent className="p-0">
         <div className="relative overflow-hidden rounded-t-2xl">
           {slider.imageUrl && (
-            <img src={imgSrc} alt={slider.translated?.title || "slider"} className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300" />
+            <img
+              src={imgSrc}
+              alt={slider.translated?.title || "slider"}
+              width={400}
+              height={192}
+              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+            />
           )}
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 dark:bg-black/30 dark:group-hover:bg-black/20 transition-colors duration-300 rounded-t-2xl" />
         </div>
@@ -62,12 +68,16 @@ const HomeSliderCard: React.FC<Props> = ({ slider, openDropdownId, onDropdownTog
               style={{ maxWidth: "calc(100vw - 1rem)", minWidth: "max-content" }}
             >
               {onEdit && (
-                <DropdownItem onItemClick={onEdit} className="text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                <DropdownItem
+                  onItemClick={onEdit}
+                >
                   {messages["edit"] || "Edit"}
                 </DropdownItem>
               )}
               {onDelete && (
-                <DropdownItem onItemClick={onDelete} className="text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                <DropdownItem
+                  onItemClick={onDelete}
+                >
                   {messages["delete"] || "Delete"}
                 </DropdownItem>
               )}

@@ -88,7 +88,7 @@ const AddCategoryComponent: React.FC = () => {
       setTimeout(() => {
         setMessage(null);
         router.push("/categories/list-categories");
-      }, 1500);
+      }, 700);
 
     } catch (err) {
       console.error(err);

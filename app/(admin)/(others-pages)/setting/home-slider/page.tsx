@@ -1,4 +1,4 @@
-import AddSliderComponent from "@/components/home-slider/add-slider/AddSliderComponent";
+import SliderComponent from "@/components/setting/home-slider/SliderComponent";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,10 +6,10 @@ export const metadata: Metadata = {
   description: "Admin Dashboard",
 };
 
-export default function AddSliderPage() {
+export default function ListPage() {
   return (
     <section className="space-y-6">
-      <AddSliderComponent />
+      <SliderComponent />
     </section>
   );
 }

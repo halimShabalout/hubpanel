@@ -71,7 +71,7 @@ export const EditAboutUsModal = ({
         setSuccessMessage(null);
         onClose();
         handleSave();
-      }, 1500);
+      }, 700);
     } catch (err) {
       console.error("Error updating about us:", err);
     }

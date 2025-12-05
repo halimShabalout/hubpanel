@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Table, TableBody, TableCell, TableHeader, TableRow, Td, Th } from "@/components/ui/table";
+import { Table, TableBody, TableHeader, TableRow, Td, Th } from "@/components/ui/table";
 import Button from "@/components/ui/button/Button";
 import { PencilIcon, TrashBinIcon } from "@/icons";
 import EditProductModal from "./FormModals/EditProductModal";
@@ -128,7 +128,6 @@ const ProductsComponent: React.FC<Props> = ({ categoryId, categoryName: initialC
                   <Th>{messages["actions"] || "Actions"}</Th>
                 </TableRow>
               </TableHeader>
-
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {products.length > 0 ? (
                   products.map((product) => {

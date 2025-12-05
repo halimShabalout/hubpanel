@@ -132,7 +132,7 @@ const EditCategoryModal: React.FC<Props> = ({
       });
 
       setMessage({ text: messages["updated_successfully"] || "Updated successfully!", type: "success" });
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 700));
       onClose();
       onSuccess();
 

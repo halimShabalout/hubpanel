@@ -131,16 +131,16 @@ const UsersComponent = () => {
                         >
                           {user.status ? messages["active"] || "Active" : messages["inactive"] || "Inactive"}
                         </Td>
-                      <Td>
-                        <div className="flex items-center gap-5">
+                      <Td className="px-6 py-4 text-gray-800 dark:text-white">
+                        <div className="-mx-[5px] flex items-center gap-2">
                           {canEditUser && (
                             <button onClick={() => openEditModal(user)} title={messages["edit_user"] || "Edit User"}>
-                              <PencilIcon />
+                              <PencilIcon  width={20} height={20}/>
                             </button>
                           )}
                           {canDeleteUser && (
                             <button onClick={() => openDeleteModal(user)} title={messages["delete"] + " " + (messages["users"] || "User") || "Delete User"}>
-                              <TrashBinIcon />
+                              <TrashBinIcon width={20} height={20}/>
                             </button>
                           )}
                         </div>
