@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
-import Label from "@/components/form/Label";
 import InputField from "@/components/form/input/InputField";
 import TextArea from "@/components/form/input/TextArea";
 import Form from "@/components/form/Form";

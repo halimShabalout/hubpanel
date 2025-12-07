@@ -90,7 +90,6 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                 {onViewProducts && (
                   <DropdownItem
                     onItemClick={onViewProducts}
-                    className="text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     {messages["categoy_view_products"] || "View Products"}
                   </DropdownItem>
@@ -98,7 +97,6 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                 {onEdit && (
                   <DropdownItem
                     onItemClick={onEdit}
-                    className="text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     {messages["edit"] || "Edit"}
                   </DropdownItem>
@@ -106,7 +104,6 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                 {onDelete && (
                   <DropdownItem
                     onItemClick={onDelete}
-                    className="text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     {messages["delete"] || "Delete"}
                   </DropdownItem>

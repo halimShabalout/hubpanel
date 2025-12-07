@@ -41,7 +41,7 @@ const DeleteConfirmModal: React.FC<Props> = ({
       setTimeout(() => {
         setIsDeleting(false);
         onClose();
-      }, 1000);
+      }, 700);
     } catch (e) {
       setError(true);
       setIsDeleting(false);

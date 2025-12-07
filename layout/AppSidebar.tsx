@@ -138,17 +138,9 @@ const getOtherItems = (
 
   items.push({
     icon: <EnvelopeIcon />,
-    name: messages["home_slider"] || "Home Slider",
-    subItems: [
-      { name: messages["home_slider"] || "Home Slider", path: "/home-slider/list-slider" },
-      { name: messages["add_home_slider"] || "Add", path: "/home-slider/add-slider" },
-    ],
-  });
-
-  items.push({
-    icon: <EnvelopeIcon />,
     name: messages["setting"] || "Setting",
     subItems: [
+      { name: messages["home_slider"] || "Home Slider", path: "/setting/home-slider" },
       { name: messages["about_us"] || "About Us", path: "/setting/about-us" },
       { name: messages["contact_informations"] || "Contact Information", path: "/setting/contact-information" },
       { name: messages["social_links"] || "Social Links", path: "/setting/social-links" },

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { motion, Variants } from "framer-motion";
+import { ChevronDownIcon } from "@/icons";
 
 interface Option {
   value: string;
@@ -52,7 +53,6 @@ const Select: React.FC<SelectProps> = ({
 
   const displayText = options.find((opt) => opt.value === value)?.label || placeholder || "";
 
-  // تم تحديد النوع Variants بشكل صريح واستخدام مصفوفة لـ ease
   const dropdownVariants: Variants = { 
     hidden: { 
       opacity: 0, 
@@ -60,7 +60,7 @@ const Select: React.FC<SelectProps> = ({
       scaleY: 0.95,
       transition: { 
         duration: 0.2, 
-        ease: [0.4, 0.0, 0.2, 1] // cubic-bezier for easeOut
+        ease: [0.4, 0.0, 0.2, 1] 
       },
       transitionEnd: { display: "none" }
     },
@@ -97,20 +97,7 @@ const Select: React.FC<SelectProps> = ({
         <span className={`${value ? "text-gray-800 dark:text-white/90" : "text-gray-400 dark:text-gray-400"} truncate`}>
           {displayText || ""}
         </span>
-        <svg
-          className={`w-5 h-5 stroke-current transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-          viewBox="0 0 20 20"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M4.79175 7.39551L10.0001 12.6038L15.2084 7.39551"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <ChevronDownIcon />
       </div>
 
       <motion.div 

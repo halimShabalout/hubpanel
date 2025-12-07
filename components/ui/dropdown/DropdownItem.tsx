@@ -1,5 +1,6 @@
 import type React from "react";
 import Link from "next/link";
+import { useLocale } from "@/context/LocaleContext";
 
 interface DropdownItemProps {
   tag?: "a" | "button";
@@ -20,8 +21,9 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
   className = "",
   children,
 }) => {
-  const combinedClasses = `${baseClassName} ${className}`.trim();
-
+  const { locale } = useLocale();
+  const isRtl = locale === "ar";
+  const combinedClasses = `${baseClassName} ${className} ${isRtl ? "text-right" : "text-left"}`.trim();
   const handleClick = (event: React.MouseEvent) => {
     if (tag === "button") {
       event.preventDefault();

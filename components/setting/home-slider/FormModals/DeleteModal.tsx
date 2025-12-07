@@ -13,7 +13,7 @@ interface Props {
   slider?: HomeSlider | null;
 }
 
-const DeleteSliderModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, slider }) => {
+const DeleteModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, slider }) => {
   const { messages, locale } = useLocale();
   const { remove } = useHomeSlider(locale);
   const [message, setMessage] = useState<string | null>(null);
@@ -59,4 +59,4 @@ const DeleteSliderModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, slider
   );
 };
 
-export default DeleteSliderModal;
+export default DeleteModal;

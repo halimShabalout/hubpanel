@@ -5,15 +5,16 @@ import TitleComponent from "@/components/ui/TitleComponent";
 import { useLocale } from "@/context/LocaleContext";
 import { useHomeSlider } from "@/hooks/useHomeSlider";
 import HomeSliderCard from "./HomeSliderCard";
-import EditSliderModal from "./FormModals/EditSliderModal";
-import DeleteSliderModal from "./FormModals/DeleteSliderModal";
+import AddModal from "./FormModals/AddModal";
+import EditModal from "./FormModals/EditModal";
+import DeleteModal from "./FormModals/DeleteModal";
 import { HomeSlider } from "@/types/HomeSlider";
-import Link from "next/link";
 import Button from "@/components/ui/button/Button";
 
 const SliderComponent: React.FC = () => {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [selectedSlider, setSelectedSlider] = useState<HomeSlider | null>(null);
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
@@ -24,16 +25,15 @@ const SliderComponent: React.FC = () => {
     <>
       <div className="mb-5 flex items-center justify-between lg:mb-7">
         <TitleComponent title={messages["home_slider"] || "Home Slider"} />
-        <Link href="/home-slider/add-slider">
-                  <Button className="h-9 px-4 text-sm">{messages["create"] || "Create"}</Button>
-                </Link>
+        <Button className="h-9 px-4 text-sm" onClick={() => setAddModalOpen(true)}>
+          {messages["create"] || "Create"}
+        </Button>
       </div>
-
 
       {loading && <div className="p-6">{messages["loading"] || "Loading..."}</div>}
       {error && <div className="p-6 text-red-600">{messages["error"] || "Failed to load sliders"}</div>}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {homeSlider.map((s) => (
           <HomeSliderCard
             key={s.id}
@@ -47,16 +47,23 @@ const SliderComponent: React.FC = () => {
         ))}
       </div>
 
+      {addModalOpen && (
+        <AddModal
+          isOpen={addModalOpen}
+          onClose={() => setAddModalOpen(false)}
+          onSuccess={() => refetch()}
+        />
+      )}
+
       {selectedSlider && (
         <>
-          <EditSliderModal
+          <EditModal
             slider={selectedSlider}
             isOpen={editModalOpen}
             onClose={() => setEditModalOpen(false)}
             onSuccess={() => refetch()}
           />
-
-          <DeleteSliderModal
+          <DeleteModal
             slider={selectedSlider}
             isOpen={deleteModalOpen}
             onClose={() => setDeleteModalOpen(false)}

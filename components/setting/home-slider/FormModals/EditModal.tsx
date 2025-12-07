@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Modal } from "@/components/ui/modal";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
 import InputField from "@/components/form/input/InputField";
-import Form from "@/components/form/Form";
-import { Modal } from "@/components/ui/modal";
 import { LoadingIcon } from "@/icons";
 import TitleComponent from "@/components/ui/TitleComponent";
 import { useLocale } from "@/context/LocaleContext";
@@ -52,8 +51,7 @@ const EditSliderModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, slider }
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!slider?.id) return;
     setLoading(true);
     setMessage(null);
@@ -61,27 +59,28 @@ const EditSliderModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, slider }
     try {
       await update({ id: slider.id, data: { title: form.title, subTitle: form.subTitle, ctaText: form.ctaText }, lang: locale });
       setMessage(messages["updated_successfully"] || "Updated successfully!");
-      await new Promise((res) => setTimeout(res, 1200));
-      onClose();
-      onSuccess?.();
+      setTimeout(() => {
+        onClose();
+        onSuccess?.();
+        setForm({ title: "", subTitle: "", ctaText: "" });
+        setMessage(null);
+      }, 1200);
     } catch (err) {
       console.error(err);
-      setMessage(messages["updated_error"] || "An error occurred while updating the item.");
+      setMessage(messages["updated_error"] || "An error occurred while updating.");
     } finally {
       setLoading(false);
     }
   };
 
-  const LABEL = "text-md text-gray-800 dark:text-white/90";
-
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[600px] p-6">
-      <Form onSubmit={handleSubmit}>
-        <TitleComponent title={messages["edit_home_slider"] || "Edit Slider"} className="text-center mb-6" />
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-md p-6">
+      <div className="space-y-4">
+        <TitleComponent title={messages["edit_home_slider"] || "Edit Slider"} className="text-center mb-4" />
 
-                {message && (
-          <div className={`p-4 rounded-xl border mb-4 ${
-            message.includes("successfully") || message.includes("Updated")
+        {message && (
+          <div className={`p-4 rounded-xl border ${
+            message.includes("successfully")
               ? "border-success-200 bg-success-50 text-success-700 dark:border-success-700 dark:bg-success-900/20"
               : "border-error-200 bg-error-50 text-error-700 dark:border-error-700 dark:bg-error-900/20"
           }`}>
@@ -89,32 +88,37 @@ const EditSliderModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, slider }
           </div>
         )}
 
-        <Label className={LABEL}>{messages["slider_title"] || "Title"}</Label>
-        <InputField name="title" value={form.title} onChange={handleChange} />
+        <div className="space-y-3">
+          <div>
+            <Label className="text-md text-gray-800 dark:text-white/90">{messages["slider_title"] || "Title"}</Label>
+            <InputField name="title" value={form.title} onChange={handleChange} />
+          </div>
+          <div>
+            <Label className="text-md text-gray-800 dark:text-white/90">{messages["slider_subtitle"] || "Sub Title"}</Label>
+            <InputField name="subTitle" value={form.subTitle} onChange={handleChange} />
+          </div>
+          <div>
+            <Label className="text-md text-gray-800 dark:text-white/90">{messages["slider_cta_text"] || "CTA Text"}</Label>
+            <InputField name="ctaText" value={form.ctaText} onChange={handleChange} />
+          </div>
+        </div>
 
-        <Label className={LABEL}>{messages["slider_subtitle"] || "Sub Title"}</Label>
-        <InputField name="subTitle" value={form.subTitle} onChange={handleChange} />
-
-        <Label className={LABEL}>{messages["slider_cta_text"] || "CTA Text"}</Label>
-        <InputField name="ctaText" value={form.ctaText} onChange={handleChange} />
-
-        <div className="flex justify-end mt-6 gap-3">
+        <div className="flex justify-end gap-3 mt-6">
           <Button variant="outline" onClick={onClose} disabled={loading}>
             {messages["cancel"]}
           </Button>
-
-          <Button type="submit" disabled={loading}>
+          <Button onClick={handleSubmit} disabled={loading}>
             {loading ? (
               <>
-                <LoadingIcon className="animate-spin" />
-                {messages["updating"]}
+                <LoadingIcon className="animate-spin -ml-1 mr-2" />
+                {messages["updating"] || "Updating..."}
               </>
             ) : (
               messages["update"] || "Update"
             )}
           </Button>
         </div>
-      </Form>
+      </div>
     </Modal>
   );
 };
