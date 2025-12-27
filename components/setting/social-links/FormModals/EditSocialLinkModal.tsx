@@ -71,6 +71,13 @@ const EditSocialLinkModal: React.FC<Props> = ({
     if (!link?.id) return;
 
     setMessage(null);
+     if (!form.icon) {
+            setMessage({
+                text: messages["icon_required_social_link"] || "Icon is required",
+                type: "error",
+            });
+            return;
+        }
 
     try {
       await updateSocialLink.mutateAsync({
@@ -121,7 +128,6 @@ const EditSocialLinkModal: React.FC<Props> = ({
           </p>
         </div>
 
-        {/* ✅ Message الموحد */}
         <Message message={message} />
 
         <Form onSubmit={handleSubmit} className="flex flex-col flex-1">
@@ -130,10 +136,13 @@ const EditSocialLinkModal: React.FC<Props> = ({
               <div className="space-y-2">
                 <Label>{messages["platform"] || "Platform"}</Label>
                 <Input
+                required
                   value={form.platform}
                   onChange={(e) =>
                     handleChange("platform", e.target.value)
                   }
+                   placeholder={messages["platform_placeholder_social_link"] || "e.g., Facebook"}
+
                 />
               </div>
 
@@ -153,6 +162,7 @@ const EditSocialLinkModal: React.FC<Props> = ({
             <div className="space-y-2">
               <Label>{messages["url"] || "URL"}</Label>
               <Input
+              required
                 value={form.url}
                 onChange={(e) => handleChange("url", e.target.value)}
                 placeholder="https://"

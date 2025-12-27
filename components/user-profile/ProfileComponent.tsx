@@ -14,12 +14,12 @@ import { PERMISSIONS } from "@/types/Permissions";
 const ProfileComponent = () => {
   const { messages } = useLocale();
   const { data: currentUser, isLoading, refetch } = useCurrentUser();
+  const canUpdateProfile = useHasPermission(PERMISSIONS.EDIT_PROFILE);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   if (isLoading) { <LoadingComponent title="." /> }
   if (!currentUser) return <p>{messages["user_not_found"] || "User not found"}</p>;
 
-  const canUpdateProfile = useHasPermission(PERMISSIONS.EDIT_PROFILE);
 
   return (
     <>

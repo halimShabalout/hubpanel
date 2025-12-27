@@ -8,7 +8,8 @@ import {
   SiLinkedin,
   SiInstagram,
   SiX,
-  SiYoutube
+  SiYoutube,
+  SiWhatsapp
 } from "react-icons/si";
 
 /* -------------------------------------------------------------------------- */
@@ -22,7 +23,8 @@ const SOCIAL_ICONS = {
   Linkedin: SiLinkedin,
   Instagram: SiInstagram,
   X: SiX,
-  Youtube: SiYoutube
+  Youtube: SiYoutube,
+  Whatsapp: SiWhatsapp
 } as const;
 
 export type IconName = keyof typeof SOCIAL_ICONS;
@@ -34,7 +36,8 @@ const AVAILABLE_ICONS: IconName[] = [
   "Linkedin",
   "Instagram",
   "X",
-  "Youtube"
+  "Youtube",
+  "Whatsapp"
 ];
 
 /* -------------------------------------------------------------------------- */

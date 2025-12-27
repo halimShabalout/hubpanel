@@ -16,7 +16,7 @@ export interface Product {
   priority: number;
   createdAt: string;
   updatedAt: string;
-  images?: ProductImage[];
+  Images?: ProductImage[];
   translated?: ProductTranslated;
   mainImage?: string | null;
   _links?: ApiLinks;

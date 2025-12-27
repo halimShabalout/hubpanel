@@ -54,6 +54,13 @@ const AddSocialLinkModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
     const handleSubmit = async () => {
         setMessage(null);
 
+        if (!form.icon) {
+            setMessage({
+                text: messages["icon_required_social_link"] || "Icon is required",
+                type: "error",
+            });
+            return;
+        }
         const payload = {
             platform: form.platform.trim(),
             icon: form.icon.trim(),
@@ -102,8 +109,10 @@ const AddSocialLinkModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
                             <div className="space-y-2">
                                 <Label>{messages["platform"] || "Platform"}</Label>
                                 <Input
+                                    required
                                     value={form.platform}
                                     onChange={(e) => handleChange("platform", e.target.value)}
+                                    placeholder={messages["platform_placeholder_social_link"] || "e.g., Facebook"}
                                 />
                             </div>
 
@@ -121,6 +130,7 @@ const AddSocialLinkModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => 
                         <div className="space-y-2">
                             <Label>{messages["url"] || "URL"}</Label>
                             <Input
+                                required
                                 value={form.url}
                                 onChange={(e) => handleChange("url", e.target.value)}
                                 placeholder="https://"

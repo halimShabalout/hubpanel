@@ -97,7 +97,7 @@ const EditProductModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, product
 
     const payload = {
       name: form.name.trim(),
-      description: form.description.trim() || undefined,
+      description: form.description.trim() || "",
       stockQuantity: form.stockQuantity,
       priority: form.priority,
       isActive: form.isActive,

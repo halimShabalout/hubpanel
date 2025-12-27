@@ -39,6 +39,8 @@ const AddModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
   const [fileName, setFileName] = useState("No file chosen");
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
   const [success, setSuccess] = useState(false);
+  const [fileError, setFileError] = useState(false);
+
 
   useEffect(() => {
     if (!success) {
@@ -56,13 +58,45 @@ const AddModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
+
+    if (!selectedFile) {
+      setFile(null);
+      setFileName("No file chosen");
+      setFileError(false);
+      return;
+    }
+
+    if (!selectedFile.type.startsWith("image/")) {
+      setMessage({
+        text: messages["only_images_allowed"] || "Only image files are allowed",
+        type: "error",
+      });
+
+      e.target.value = "";
+      setFile(null);
+      setFileName("No file chosen");
+      setFileError(true);
+      return;
+    }
+
     setFile(selectedFile);
-    setFileName(selectedFile?.name || "No file chosen");
+    setFileName(selectedFile.name);
+    setFileError(false);
+    setMessage(null);
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage(null);
+
+    if (fileError) {
+      setMessage({
+        text: messages["only_images_allowed"] || "Only image files are allowed",
+        type: "error",
+      });
+      return;
+    }
 
     if (!form.title.trim()) {
       setMessage({
@@ -198,7 +232,7 @@ const AddModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
             type="submit"
             variant="primary"
             size="sm"
-            disabled={CreateHomeSlider.isPending || success}
+            disabled={CreateHomeSlider.isPending || success || fileError}
             className="text-white"
           >
             {CreateHomeSlider.isPending ? (

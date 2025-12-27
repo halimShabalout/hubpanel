@@ -33,6 +33,7 @@ const AddCategoryComponent: React.FC = () => {
 
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState("No file chosen");
+  const [fileError, setFileError] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,13 +50,42 @@ const AddCategoryComponent: React.FC = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
+
+    if (!selectedFile) {
+      setFile(null);
+      setFileName("No file chosen");
+      setFileError(false);
+      return;
+    }
+
+    if (!selectedFile.type.startsWith("image/")) {
+      setFile(null);
+      setFileName("No file chosen");
+      setFileError(true);
+      setMessage({
+        text: messages["only_images_allowed"] || "Only image files are allowed",
+        type: "error",
+      });
+      return;
+    }
+
     setFile(selectedFile);
-    setFileName(selectedFile?.name || "No file chosen");
+    setFileName(selectedFile.name);
+    setFileError(false);
+    setMessage(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage(null);
+
+    if (fileError) {
+      setMessage({
+        text: messages["only_images_allowed"] || "Only image files are allowed",
+        type: "error",
+      });
+      return;
+    }
 
     if (!file) {
       setMessage({
@@ -82,9 +112,7 @@ const AddCategoryComponent: React.FC = () => {
       setTimeout(() => {
         router.push("/categories/list-categories");
       }, 600);
-
-    } catch (error) {
-      console.error(error);
+    } catch {
       setMessage({
         text: messages["created_error"] || "An error occurred while creating.",
         type: "error",
@@ -141,7 +169,7 @@ const AddCategoryComponent: React.FC = () => {
           </div>
 
           <div className="flex justify-end mt-6">
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending || fileError}>
               {isPending ? (
                 <>
                   <LoadingIcon className="animate-spin mr-2" />

@@ -51,16 +51,12 @@ export const EditContactInformationModal = ({
     });
   }, [data, locale]);
 
-  //
-  // Handle form change
-  //
+  // -----------------------------Handlers -------------------------------
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  //
-  // Submit
-  //
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage(null);
@@ -131,6 +127,7 @@ export const EditContactInformationModal = ({
             <div className="space-y-2">
               <Label>{messages["phone"]}</Label>
               <Input
+                required
                 value={form.phone}
                 onChange={(e) => handleChange("phone", e.target.value)}
                 placeholder={messages["phone_placeholder"] || "Enter phone number"}
@@ -141,6 +138,7 @@ export const EditContactInformationModal = ({
             <div className="space-y-2">
               <Label>{messages["whatsapp"]}</Label>
               <Input
+                required
                 value={form.whatsapp}
                 onChange={(e) => handleChange("whatsapp", e.target.value)}
                 placeholder={
@@ -153,6 +151,7 @@ export const EditContactInformationModal = ({
             <div className="space-y-2">
               <Label>{messages["email"]}</Label>
               <Input
+                required
                 type="email"
                 value={form.email}
                 onChange={(e) => handleChange("email", e.target.value)}

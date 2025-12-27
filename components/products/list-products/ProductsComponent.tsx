@@ -182,8 +182,9 @@ const ProductsComponent: React.FC<Props> = ({
                   products.map((product) => {
                     const imagePath =
                       product.mainImage ||
-                      product.images?.[0]?.url ||
+                      (product as any).Images?.[0]?.url ||
                       null;
+
 
                     const imageUrl = imagePath
                       ? imagePath.startsWith("http")

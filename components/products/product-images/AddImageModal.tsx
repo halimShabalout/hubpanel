@@ -22,14 +22,53 @@ const AddImageModal: React.FC<Props> = ({ productId, isOpen, onClose, onSuccess 
   const [file, setFile] = useState<File | null>(null);
   const [isMain, setIsMain] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [fileError, setFileError] = useState(false);
 
-  const handleSubmit = async () => {
-    setMessage(null);
 
-    if (!file) {
-      setMessage({ text: messages["file_required"] || "Please select an image file.", type: "error" });
+  //  ------------------------------ Handles ------------------------------ //
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] || null;
+
+    if (!selectedFile) {
+      setFile(null);
+      setFileError(false);
       return;
     }
+
+    if (!selectedFile.type.startsWith("image/")) {
+      setMessage({
+        text: messages["only_images_allowed"] || "Only image files are allowed",
+        type: "error"
+      });
+
+      e.target.value = "";
+      setFile(null);
+      setFileError(true);
+      return;
+    }
+
+    setFile(selectedFile);
+    setFileError(false);
+    setMessage(null);
+  };
+  const handleSubmit = async () => {
+
+    if (fileError) {
+      setMessage({
+        text: messages["only_images_allowed"] || "Only image files are allowed",
+        type: "error"
+      });
+      return;
+    }
+    if (!file) {
+      setMessage({
+        text: messages["file_required"] || "Please select an image file.",
+        type: "error"
+      });
+      return;
+    }
+
+    setMessage(null);
 
     try {
       await createProductImage.mutateAsync({ payload: { productId, isMain }, file });
@@ -40,6 +79,7 @@ const AddImageModal: React.FC<Props> = ({ productId, isOpen, onClose, onSuccess 
         onClose();
         setFile(null);
         setIsMain(false);
+        setFileError(false);
         setMessage(null);
       }, 1000);
     } catch (err: any) {
@@ -65,10 +105,15 @@ const AddImageModal: React.FC<Props> = ({ productId, isOpen, onClose, onSuccess 
       <div className="space-y-4 mt-4">
         <Label>{messages["product_image_label"] || "Product Image"}</Label>
         <label className="block border-2 border-dashed rounded-lg p-6 text-center cursor-pointer">
-          <input type="file" accept="image/*" className="hidden" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+
           {file ? file.name : messages["select_image"] || "Select image"}
         </label>
-
         <div className="flex items-center gap-2">
           <input type="checkbox" checked={isMain} onChange={(e) => setIsMain(e.target.checked)} />
           <span>{messages["is_main_helper"] || "Set as main image"}</span>
@@ -79,7 +124,7 @@ const AddImageModal: React.FC<Props> = ({ productId, isOpen, onClose, onSuccess 
         <Button variant="outline" size="sm" onClick={onClose}>
           {messages["cancel"] || "Cancel"}
         </Button>
-        <Button size="sm" disabled={createProductImage.isPending} onClick={handleSubmit}>
+        <Button size="sm" disabled={createProductImage.isPending || fileError} onClick={handleSubmit}>
           {createProductImage.isPending ? messages["creating"] || "Creating..." : messages["create"] || "Create"}
         </Button>
       </div>

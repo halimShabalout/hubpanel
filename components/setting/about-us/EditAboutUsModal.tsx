@@ -40,6 +40,7 @@ export const EditAboutUsModal = ({
   });
 
   const [loading, setLoading] = useState(false);
+  const [fileError, setFileError] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
@@ -76,17 +77,40 @@ export const EditAboutUsModal = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
-    setForm(prev => ({ ...prev, imageFile: selectedFile }));
 
-    if (selectedFile) {
-      const url = URL.createObjectURL(selectedFile);
-      setForm(prev => ({ ...prev, imagePreview: url }));
+    if (!selectedFile) {
+      setForm(prev => ({ ...prev, imageFile: null, imagePreview: prev.imagePreview }));
+      setFileError(false);
+      return;
     }
+
+    if (!selectedFile.type.startsWith("image/")) {
+      setFileError(true);
+      setMessage({
+        text: messages["only_images_allowed"] || "Only images are allowed",
+        type: "error",
+      });
+      setForm(prev => ({ ...prev, imageFile: null }));
+      return;
+    }
+
+    const url = URL.createObjectURL(selectedFile);
+
+    setFileError(false);
+    setMessage(null);
+
+    setForm(prev => ({
+      ...prev,
+      imageFile: selectedFile,
+      imagePreview: url,
+    }));
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!data?.id) return;
+    if (fileError) return;
 
     setLoading(true);
     setMessage(null);
@@ -145,7 +169,7 @@ export const EditAboutUsModal = ({
 
           {form.imagePreview && (
             <img
-              src={form.imagePreview}
+              src={form.imagePreview || ""}
               alt="preview"
               className="w-full max-h-32 object-cover rounded-xl border border-gray-200 dark:border-gray-700 mt-2"
             />
@@ -156,7 +180,7 @@ export const EditAboutUsModal = ({
               {messages["about_us_story"] || "Story"} :
             </Label>
             <TextArea
-              value={form.story}
+              value={form.story || ""}
               onChange={v => handleTextAreaChange("story", v)}
               rows={3}
             />
@@ -167,7 +191,7 @@ export const EditAboutUsModal = ({
               {messages["about_us_values"] || "Values"} :
             </Label>
             <TextArea
-              value={form.values}
+              value={form.values || ""}
               onChange={v => handleTextAreaChange("values", v)}
               rows={3}
             />
@@ -178,7 +202,7 @@ export const EditAboutUsModal = ({
               {messages["about_us_mission"] || "Mission"} :
             </Label>
             <TextArea
-              value={form.mission}
+              value={form.mission || ""}
               onChange={v => handleTextAreaChange("mission", v)}
               rows={3}
             />
@@ -189,7 +213,7 @@ export const EditAboutUsModal = ({
               {messages["about_us_vision"] || "Vision"} :
             </Label>
             <TextArea
-              value={form.vision}
+              value={form.vision || ""}
               onChange={v => handleTextAreaChange("vision", v)}
               rows={3}
             />
@@ -199,7 +223,7 @@ export const EditAboutUsModal = ({
             <Button variant="outline" onClick={onClose} disabled={loading}>
               {messages["cancel"] || "Cancel"}
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading || fileError}>
               {loading ? (
                 <>
                   <LoadingIcon className="animate-spin" />

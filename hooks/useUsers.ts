@@ -12,7 +12,7 @@ import { User } from "@/types/User";
 
 export const useUsers = (lang: string) => {
   return useQuery({
-    queryKey: ["users"],
+    queryKey: ["users", lang],
     queryFn: async () => {
       const res = await getUsers(lang);
       return res.data;

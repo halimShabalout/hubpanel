@@ -48,6 +48,7 @@ const EditCategoryModal: React.FC<Props> = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [fileError, setFileError] = useState(false);
 
   useEffect(() => {
     if (category && isOpen) {
@@ -100,12 +101,31 @@ const EditCategoryModal: React.FC<Props> = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
 
+    if (!selectedFile) {
+      setFileError(false);
+      return;
+    }
+
+    if (!selectedFile.type.startsWith("image/")) {
+      setMessage({
+        text: messages["only_images_allowed"] || "Only image files are allowed",
+        type: "error"
+      });
+      e.target.value = "";
+      setForm(prev => ({ ...prev, file: null }));
+      setPreviewUrl(null);
+      setFileError(true);
+      return;
+    }
+
     setForm(prev => ({ ...prev, file: selectedFile }));
 
     if (selectedFile) {
       const url = URL.createObjectURL(selectedFile);
       setPreviewUrl(url);
     }
+    setFileError(false);
+    setMessage(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -156,6 +176,7 @@ const EditCategoryModal: React.FC<Props> = ({
         {/* Name */}
         <Label className={LABEL}>{messages["category_name"]}</Label>
         <InputField
+          required
           name="name"
           value={form.name}
           onChange={handleChange}
@@ -178,9 +199,9 @@ const EditCategoryModal: React.FC<Props> = ({
 
         {/* Image */}
         <Label className={LABEL}>{messages["category_image"]}</Label>
-        <FileInput 
+        <FileInput
           onChange={handleFileChange}
-          accept="image/*" 
+          accept="image/*"
           placeholder={messages["choose_file"] || "Choose File"}
         />
 
@@ -194,7 +215,7 @@ const EditCategoryModal: React.FC<Props> = ({
             {messages["cancel"]}
           </Button>
 
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading || fileError}>
             {loading ? (
               <>
                 <LoadingIcon className="animate-spin" />
