@@ -341,31 +341,31 @@ const AppSidebar: React.FC = () => {
             <div className="flex items-center gap-3">
               <Image
                 className="dark:hidden"
-                src="/images/logo/light-theme-logo.png"
+                src={locale === 'en' ? '/dark-mode-en.png' : '/dark-mode-ar.png'}
                 alt="Logo"
                 width={200}
-                height={40}
+                height={10}
               />
               <Image
                 className="hidden dark:block"
-                src="/images/logo/dark-theme-logo.png"
+                src={locale === 'en' ? '/light-mode-en.png' : '/light-mode-ar.png'}
                 alt="Logo"
                 width={200}
-                height={40}
+                height={10}
               />
             </div>
           ) : (
             <>
               <Image
                 className="dark:hidden"
-                src="/images/logo/main-logo.png"
+                src="/logo.png"
                 alt="Logo"
                 width={50}
                 height={10}
               />
               <Image
                 className="hidden dark:block"
-                src="/images/logo/main-logo.png"
+                src="/logo.png"
                 alt="Logo"
                 width={50}
                 height={10}

@@ -3,16 +3,17 @@ import Image from "next/image";
 import { useLocale } from "@/context/LocaleContext";
 
 const AuthSection = () => {
-  const { messages } = useLocale();
+  const { messages, locale } = useLocale();
 
   return (
-    <div className="flex flex-col items-center max-w-xs">
+    <div className="flex flex-col items-center max-w-md">
       <Image
-        width={400}
-        height={40}
-        src="/images/logo/dark-theme-logo.png"
+        width={600}
+        height={60}
+        src={locale === 'en' ? '/light-mode-en.png' : '/light-mode-ar.png'}
         alt="Logo"
       />
+
       <p className="text-center text-xlg text-gray-400 dark:text-white/80">
         {messages["register_sentence"] || "Create Quotes Fast. Close Deals Faster."}
       </p>

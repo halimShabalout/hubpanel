@@ -7,11 +7,13 @@ import { ThemeToggleButton } from "@/components/common/ThemeToggleButton";
 import UserDropdown from "@/components/header/UserDropdown";
 import { useSidebar } from "@/context/SidebarContext";
 import LanguageSwitcher from "@/components/header/LanguageSwitcher";
+import { useLocale } from "@/context/LocaleContext";
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
   const inputRef = useRef<HTMLInputElement>(null);
+  const { locale } = useLocale();
 
   const handleToggle = () => {
     if (typeof window !== "undefined" && window.innerWidth >= 1024) {
@@ -93,7 +95,7 @@ const AppHeader: React.FC = () => {
               <Image
                 priority
                 className="dark:hidden"
-                src="/images/logo/light-theme-logo.png"
+                src={locale === 'en' ? '/dark-mode-en.png' : '/dark-mode-ar.png'}
                 alt="Logo"
                 width={200}
                 height={40}
@@ -101,7 +103,7 @@ const AppHeader: React.FC = () => {
               <Image
                 priority
                 className="hidden dark:block"
-                src="/images/logo/dark-theme-logo.png"
+                src={locale === 'en' ? '/light-mode-en.png' : '/light-mode-ar.png'}
                 alt="Logo"
                 width={200}
                 height={40}
