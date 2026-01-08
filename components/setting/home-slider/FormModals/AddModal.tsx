@@ -153,7 +153,7 @@ const AddModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
         {messages["add_home_slider"] || "Add Slider"}
       </h4>
 
-      {/* ✅ Message الموحد */}
+      {/*  Message  */}
       <Message message={message} />
 
       <Form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4">

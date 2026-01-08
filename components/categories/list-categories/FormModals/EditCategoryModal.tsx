@@ -164,32 +164,34 @@ const EditCategoryModal: React.FC<Props> = ({
     }
   };
 
-  const LABEL = "text-md text-gray-800 dark:text-white/90";
-
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-8 ">
-      <Form onSubmit={handleSubmit}>
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-6 ">
+      <Form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <TitleComponent title={messages["edit_product_category"] || "Edit Category"} className="text-center mb-6" />
 
         <Message message={message} />
 
         {/* Name */}
-        <Label className={LABEL}>{messages["category_name"]}</Label>
         <InputField
+          label={messages["category_name"] || "Category Name"}
           required
           name="name"
           value={form.name}
           onChange={handleChange}
-          placeholder={messages["category_name_placeholder"]}
+          placeholder={messages["category_name_placeholder"] || "Enter category name"}
         />
 
         {/* Description */}
-        <Label className={LABEL}>{messages["category_description"]}</Label>
-        <TextArea value={form.description} onChange={handleTextAreaChange} rows={4} />
+        <TextArea
+          label={messages["category_description"] || "Category Description"}
+          value={form.description}
+          onChange={handleTextAreaChange}
+          placeholder={messages["category_description_placeholder"] || "Enter category description"}
+          rows={4} />
 
         {/* Priority */}
-        <Label className={LABEL}>{messages["categoy_priority"] || "Priority"}</Label>
         <InputField
+          label={messages["categoy_priority"] || "Priority"}
           type="number"
           name="priority"
           min={0}
@@ -198,7 +200,7 @@ const EditCategoryModal: React.FC<Props> = ({
         />
 
         {/* Image */}
-        <Label className={LABEL}>{messages["category_image"]}</Label>
+        <Label>{messages["category_image"]}</Label>
         <FileInput
           onChange={handleFileChange}
           accept="image/*"

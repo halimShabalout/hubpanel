@@ -136,6 +136,7 @@ const AddCategoryComponent: React.FC = () => {
             name="name"
             value={form.name}
             onChange={handleChange}
+            placeholder={messages["category_name_placeholder"] || "Enter category name"}
             required
           />
 
@@ -143,6 +144,7 @@ const AddCategoryComponent: React.FC = () => {
             label={messages["category_description"] || "Category Description"}
             value={form.description}
             onChange={handleTextAreaChange}
+            placeholder={messages["category_description_placeholder"] || "Enter category description"}
             rows={4}
           />
 
@@ -155,6 +157,7 @@ const AddCategoryComponent: React.FC = () => {
                 onChange={handleFileChange}
                 accept="image/*"
                 fileName={fileName}
+                placeholder={messages["choose_file"] || "Choose File"}
               />
             </div>
 
