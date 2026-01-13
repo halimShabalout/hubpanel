@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useMutation, useQuery, useQueryClient, UseMutationResult } from "@tanstack/react-query";
 import { authService } from "@/services/authService";
 import { LoginRequest, LoginResponse, ForgotPasswordRequest, ForgotPasswordResponse, ResetPasswordRequest, ResetPasswordResponse } from "@/types/Auth";
@@ -52,7 +53,11 @@ export function useLogout() {
  */
 export const useHasPermission = (endpoint: string): boolean => {
   const { data: user } = useCurrentUser();
-  return !!user?.permissions?.some((p: Permission) => p.endpoint === endpoint);
+
+  return useMemo(() => {
+    if (!user?.permissions) return false;
+    return user.permissions.some((p: Permission) => p.endpoint === endpoint);
+  }, [user, endpoint]);
 };
 
 /**

@@ -150,7 +150,7 @@ const AddCategoryComponent: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label>
+              <Label className={"block text-sm font-medium text-gray-700 dark:text-white"}>
                 {messages["category_image"] || "Category Image"} *
               </Label>
               <FileInput

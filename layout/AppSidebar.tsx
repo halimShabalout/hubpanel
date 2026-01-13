@@ -16,8 +16,8 @@ import {
   EnvelopeIcon
 } from "../icons";
 import { useLocale } from "@/context/LocaleContext";
-import { useHasPermission } from "@/hooks/useAuth";
 import { PERMISSIONS } from "@/types/Permissions";
+import { useCurrentUser } from "@/hooks/useAuth";
 
 type SubItem = Exclude<NavItem["subItems"], undefined>[number];
 
@@ -92,8 +92,6 @@ const getOtherItems = (
   messages: Record<string, string>,
   canViewRoles: boolean,
   canViewPermissions: boolean,
-  canViewLanguages: boolean,
-  canViewLanguageKeys: boolean,
   canViewUsers: boolean,
   canViewProfile: boolean,
   canViewHomeSlider: boolean,
@@ -117,21 +115,6 @@ const getOtherItems = (
       });
     }
   }
-
-  // if (canViewLanguages || canViewLanguageKeys) {
-  //   const languageSubItems: SubItem[] = [
-  //     canViewLanguages && { name: messages["languages_list"] || "Languages", path: "/languages/lang" },
-  //     canViewLanguageKeys && { name: messages["languages_keys"] || "Language Keys", path: "/languages/translations" },
-  //   ].filter(Boolean) as SubItem[];
-
-  //   if (languageSubItems.length > 0) {
-  //     items.push({
-  //       icon: <LockIcon />,
-  //       name: messages["languages"] || "Languages",
-  //       subItems: languageSubItems,
-  //     });
-  //   }
-  // }
 
   if (canViewUsers) {
     items.push({
@@ -167,28 +150,36 @@ const getOtherItems = (
   return items;
 };
 
+// --------------------------
+
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
   const { locale, messages } = useLocale();
   const dir = locale === "ar" ? "rtl" : "ltr";
 
-  const canViewDashboard = useHasPermission(PERMISSIONS.VIEW_DASHBOARD);
-  const canViewCategories = useHasPermission(PERMISSIONS.VIEW_CATEGORIES);
-  const canAddCategory = useHasPermission(PERMISSIONS.ADD_CATEGORY);
-  const canViewProducts = useHasPermission(PERMISSIONS.VIEW_PRODUCTS);
-  const canAddProduct = useHasPermission(PERMISSIONS.ADD_PRODUCT);
-  const canViewContactRequests = useHasPermission(PERMISSIONS.VIEW_CONTACT_REQUESTS);
-  const canViewRoles = useHasPermission(PERMISSIONS.VIEW_ROLES);
-  const canViewPermissions = useHasPermission(PERMISSIONS.VIEW_PERMISSIONS);
-  const canViewLanguages = useHasPermission(PERMISSIONS.VIEW_LANGUAGES);
-  const canViewLanguageKeys = useHasPermission(PERMISSIONS.VIEW_LANGUAGE_KEYS);
-  const canViewUsers = useHasPermission(PERMISSIONS.VIEW_USERS);
-  const canViewProfile = useHasPermission(PERMISSIONS.VIEW_PROFILE);
-  const canViewHomeSlider = useHasPermission(PERMISSIONS.VIEW_HOME_SLIDER);
-  const canViewAboutUs = useHasPermission(PERMISSIONS.VIEW_ABOUT_US);
-  const canViewContactInfo = useHasPermission(PERMISSIONS.VIEW_CONTACT_INFORMATION);
-  const canViewSocialLinks = useHasPermission(PERMISSIONS.VIEW_SOCIAL_LINKS);
+  const { data: user } = useCurrentUser();
+
+  const hasPermission = useCallback(
+    (perm: string) =>
+      !!user?.permissions?.some(p => p.endpoint === perm),
+    [user]
+  );
+
+  const canViewDashboard = hasPermission(PERMISSIONS.VIEW_DASHBOARD);
+  const canViewCategories = hasPermission(PERMISSIONS.VIEW_CATEGORIES);
+  const canAddCategory = hasPermission(PERMISSIONS.ADD_CATEGORY);
+  const canViewProducts = hasPermission(PERMISSIONS.VIEW_PRODUCTS);
+  const canAddProduct = hasPermission(PERMISSIONS.ADD_PRODUCT);
+  const canViewContactRequests = hasPermission(PERMISSIONS.VIEW_CONTACT_REQUESTS);
+  const canViewRoles = hasPermission(PERMISSIONS.VIEW_ROLES);
+  const canViewPermissions = hasPermission(PERMISSIONS.VIEW_PERMISSIONS);
+  const canViewUsers = hasPermission(PERMISSIONS.VIEW_USERS);
+  const canViewProfile = hasPermission(PERMISSIONS.VIEW_PROFILE);
+  const canViewHomeSlider = hasPermission(PERMISSIONS.VIEW_HOME_SLIDER);
+  const canViewAboutUs = hasPermission(PERMISSIONS.VIEW_ABOUT_US);
+  const canViewContactInfo = hasPermission(PERMISSIONS.VIEW_CONTACT_INFORMATION);
+  const canViewSocialLinks = hasPermission(PERMISSIONS.VIEW_SOCIAL_LINKS);
 
   const navItems = useMemo(
     () => getNavItems(
@@ -208,8 +199,6 @@ const AppSidebar: React.FC = () => {
       messages as Record<string, string>,
       canViewRoles,
       canViewPermissions,
-      canViewLanguages,
-      canViewLanguageKeys,
       canViewUsers,
       canViewProfile,
       canViewHomeSlider,
@@ -217,7 +206,7 @@ const AppSidebar: React.FC = () => {
       canViewContactInfo,
       canViewSocialLinks
     ),
-    [messages, canViewRoles, canViewPermissions, canViewLanguages, canViewLanguageKeys, canViewUsers, canViewProfile, canViewHomeSlider, canViewAboutUs, canViewContactInfo, canViewSocialLinks]
+    [messages, canViewRoles, canViewPermissions, canViewUsers, canViewProfile, canViewHomeSlider, canViewAboutUs, canViewContactInfo, canViewSocialLinks]
   );
 
   const [openSubmenu, setOpenSubmenu] = useState<{ type: "main" | "others"; index: number } | null>(null);
@@ -341,14 +330,14 @@ const AppSidebar: React.FC = () => {
             <div className="flex items-center gap-3">
               <Image
                 className="dark:hidden"
-                src={locale === 'en' ? '/dark-mode-en.png' : '/dark-mode-ar.png'}
+                src={locale === 'en' ? '/en-light-mode.png' : '/ar-light-mode.png'}
                 alt="Logo"
                 width={200}
                 height={10}
               />
               <Image
                 className="hidden dark:block"
-                src={locale === 'en' ? '/light-mode-en.png' : '/light-mode-ar.png'}
+                src={locale === 'en' ? '/en-dark-mode.png' : '/ar-dark-mode.png'}
                 alt="Logo"
                 width={200}
                 height={10}

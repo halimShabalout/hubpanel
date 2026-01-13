@@ -95,7 +95,7 @@ const AppHeader: React.FC = () => {
               <Image
                 priority
                 className="dark:hidden"
-                src={locale === 'en' ? '/dark-mode-en.png' : '/dark-mode-ar.png'}
+                src={locale === 'en' ? '/en-light-mode.png' : '/ar-light-mode.png'}
                 alt="Logo"
                 width={200}
                 height={40}
@@ -103,7 +103,7 @@ const AppHeader: React.FC = () => {
               <Image
                 priority
                 className="hidden dark:block"
-                src={locale === 'en' ? '/light-mode-en.png' : '/light-mode-ar.png'}
+                src={locale === 'en' ? '/en-dark-mode.png' : '/ar-dark-mode.png'}
                 alt="Logo"
                 width={200}
                 height={40}

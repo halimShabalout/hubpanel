@@ -10,7 +10,7 @@ const AuthSection = () => {
       <Image
         width={600}
         height={60}
-        src={locale === 'en' ? '/light-mode-en.png' : '/light-mode-ar.png'}
+        src={locale === 'en' ? '/en-dark-mode.png' : '/ar-dark-mode.png'}
         alt="Logo"
       />
 
