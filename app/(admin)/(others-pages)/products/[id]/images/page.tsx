@@ -2,6 +2,16 @@
 
 import { useParams, useSearchParams } from "next/navigation";
 import ProductImages from "@/components/products/product-images/ProductImages";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Product Images",
+  description: "Product Images.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default function ProductImagesPage() {
   const params = useParams();
