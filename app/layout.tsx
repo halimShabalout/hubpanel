@@ -1,16 +1,13 @@
 import './globals.css';
-import localFont from 'next/font/local';
+import { Cairo } from 'next/font/google'
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { ClientProviders } from '@/providers/ClientProviders';
 import type { Metadata } from 'next';
 
-const geist = localFont({
-  src: [
-    { path: '../public/geist/static/Geist-Regular.ttf', weight: '400', style: 'normal' },
-    { path: '../public/geist/static/Geist-Bold.ttf', weight: '700', style: 'normal' },
-  ],
-  variable: '--font-geist',
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -28,7 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar">
-      <body className={`${geist.variable} dark:bg-gray-900 antialiased`}>
+      <body className={`${cairo.className} antialiased`}>
         <ClientProviders>
           <ThemeProvider>
             <SidebarProvider>{children}</SidebarProvider>
