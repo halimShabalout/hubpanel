@@ -70,37 +70,37 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                 {messages["categoy_priority"] || "Priority"}: {category.priority}
               </p>
             </div>
-              <div className="relative flex-shrink-0">
-                <button
-                  className="dropdown-toggle text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
-                  disabled={!canViewCategoryProducts && !canEditCategory && !canDeleteCategory} 
-                  onClick={onToggleDropdown}>
-                  <HorizontaLDots />
-                </button>
+            <div className="relative flex-shrink-0">
+              <button
+                className="dropdown-toggle text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+                disabled={!canViewCategoryProducts && !canEditCategory && !canDeleteCategory}
+                onClick={onToggleDropdown}>
+                <HorizontaLDots />
+              </button>
 
-                <Dropdown
-                  isOpen={isDropdownOpen}
-                  onClose={onCloseDropdown}
-                  className={`w-28 origin-top-left ${isRtl ? "right-auto left-0" : "right-0 left-auto"} ${isRtl ? "rtl" : ""} `}
-                  style={{ maxWidth: "calc(100vw - 1rem)", minWidth: "max-content" }}
-                >
-                  {onViewProducts && canViewCategoryProducts && (
-                    <DropdownItem onItemClick={onViewProducts}>
-                      {messages["categoy_view_products"] || "View Products"}
-                    </DropdownItem>
-                  )}
-                  {onEdit && canEditCategory && (
-                    <DropdownItem onItemClick={onEdit}>
-                      {messages["edit"] || "Edit"}
-                    </DropdownItem>
-                  )}
-                  {onDelete && canDeleteCategory && (
-                    <DropdownItem onItemClick={onDelete}>
-                      {messages["delete"] || "Delete"}
-                    </DropdownItem>
-                  )}
-                </Dropdown>
-              </div>
+              <Dropdown
+                isOpen={isDropdownOpen}
+                onClose={onCloseDropdown}
+                className={`w-28 origin-top-left ${isRtl ? "right-auto left-0" : "right-0 left-auto"} ${isRtl ? "rtl" : ""} `}
+                style={{ maxWidth: "calc(100vw - 1rem)", minWidth: "max-content" }}
+              >
+                {onViewProducts && canViewCategoryProducts && (
+                  <DropdownItem onItemClick={onViewProducts}>
+                    {messages["categoy_view_products"] || "View Products"}
+                  </DropdownItem>
+                )}
+                {onEdit && canEditCategory && (
+                  <DropdownItem onItemClick={onEdit}>
+                    {messages["edit"] || "Edit"}
+                  </DropdownItem>
+                )}
+                {onDelete && canDeleteCategory && (
+                  <DropdownItem onItemClick={onDelete}>
+                    {messages["delete"] || "Delete"}
+                  </DropdownItem>
+                )}
+              </Dropdown>
+            </div>
           </div>
         </div>
       </CardContent>
