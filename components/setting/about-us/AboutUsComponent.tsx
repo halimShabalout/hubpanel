@@ -47,14 +47,14 @@ export const AboutUsComponent = () => {
       <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 space-y-6">
         <div className="flex justify-between items-center mb-6">
           <h4 className="text-xl font-semibold text-gray-800 dark:text-white"></h4>
-          {(canEditAboutUs && 
-          <button
-            onClick={openModal}
-            className="flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.05]"
-          >
-            <PencilIcon width={20} height={20} />
-            {messages["edit"] || "Edit"}
-          </button>
+          {(canEditAboutUs &&
+            <button
+              onClick={openModal}
+              className="flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-white/[0.05]"
+            >
+              <PencilIcon width={20} height={20} />
+              {messages["edit"] || "Edit"}
+            </button>
           )}
         </div>
 

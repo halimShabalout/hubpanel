@@ -106,119 +106,119 @@ const EditSliderModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, slider }
     }));
 
   };
-   const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!slider?.id || fileError) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!slider?.id || fileError) return;
 
-      setLoading(true);
-      setMessage(null);
+    setLoading(true);
+    setMessage(null);
 
-      try {
-        const formData = new FormData();
-        formData.append("title", form.title);
-        formData.append("subTitle", form.subTitle);
-        formData.append("ctaLink", form.ctaLink);
-        formData.append("ctaText", form.ctaText);
-        if (form.imageFile) formData.append("imageUrl", form.imageFile);
+    try {
+      const formData = new FormData();
+      formData.append("title", form.title);
+      formData.append("subTitle", form.subTitle);
+      formData.append("ctaLink", form.ctaLink);
+      formData.append("ctaText", form.ctaText);
+      if (form.imageFile) formData.append("imageUrl", form.imageFile);
 
-        await updateHomeSlider.mutateAsync({ id: slider.id, data: formData, lang: locale });
+      await updateHomeSlider.mutateAsync({ id: slider.id, data: formData, lang: locale });
 
-        setMessage({
-          text: messages["updated_successfully"] || "Updated successfully",
-          type: "success",
-        });
+      setMessage({
+        text: messages["updated_successfully"] || "Updated successfully",
+        type: "success",
+      });
 
-        setTimeout(() => {
-          onClose();
-          onSuccess?.();
-          setMessage(null);
-        }, 1200);
-      } catch (err) {
-        setMessage({
-          text: messages["updated_error"] || "An error occurred",
-          type: "error",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    return (
-      <Modal isOpen={isOpen} onClose={onClose} className="max-w-md p-6">
-        <div className="space-y-4">
-          <Form onSubmit={handleSubmit}>
-            <TitleComponent
-              title={messages["edit_home_slider"] || "Edit Slider"}
-              className="text-center mb-4"
-            />
-
-            <Message message={message} />
-
-            <FileInput
-              accept="image/*"
-              onChange={handleFileChange}
-              placeholder={messages["choose_file"] || "Choose File"}
-            />
-
-            {form.imagePreview && !fileError && (
-              <img
-                src={form.imagePreview}
-                alt="preview"
-                className="w-full max-h-32 object-cover rounded-xl border border-gray-200 dark:border-gray-700 mt-2"
-              />
-            )}
-
-
-
-            <div className="space-y-3">
-              <div>
-                <Label className="text-md text-gray-800 dark:text-white/90">
-                  {messages["slider_title"] || "Title"} :
-                </Label>
-                <InputField name="title" value={form.title} onChange={handleChange} />
-              </div>
-
-              <div>
-                <Label className="text-md text-gray-800 dark:text-white/90">
-                  {messages["slider_subtitle"] || "Sub Title"} :
-                </Label>
-                <InputField name="subTitle" value={form.subTitle} onChange={handleChange} />
-              </div>
-
-              <div>
-                <Label className="text-md text-gray-800 dark:text-white/90">
-                  {messages["slider_cta_link"] || "CTA Link"} :
-                </Label>
-                <InputField name="ctaLink" value={form.ctaLink} onChange={handleChange} />
-              </div>
-
-              <div>
-                <Label className="text-md text-gray-800 dark:text-white/90">
-                  {messages["slider_cta_text"] || "CTA Text"} :
-                </Label>
-                <InputField name="ctaText" value={form.ctaText} onChange={handleChange} />
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <Button variant="outline" onClick={onClose} disabled={loading}>
-                {messages["cancel"] || "Cancel"}
-              </Button>
-              <Button type="submit" disabled={loading || !!fileError}>
-                {loading ? (
-                  <>
-                    <LoadingIcon className="animate-spin -ml-1 mr-2" />
-                    {messages["updating"] || "Updating..."}
-                  </>
-                ) : (
-                  messages["update"] || "Update"
-                )}
-              </Button>
-            </div>
-          </Form>
-        </div>
-      </Modal>
-    );
+      setTimeout(() => {
+        onClose();
+        onSuccess?.();
+        setMessage(null);
+      }, 1200);
+    } catch (err) {
+      setMessage({
+        text: messages["updated_error"] || "An error occurred",
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  export default EditSliderModal;
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-md p-6">
+      <div className="space-y-4">
+        <Form onSubmit={handleSubmit}>
+          <TitleComponent
+            title={messages["edit_home_slider"] || "Edit Slider"}
+            className="text-center mb-4"
+          />
+
+          <Message message={message} />
+
+          <FileInput
+            accept="image/*"
+            onChange={handleFileChange}
+            placeholder={messages["choose_file"] || "Choose File"}
+          />
+
+          {form.imagePreview && !fileError && (
+            <img
+              src={form.imagePreview}
+              alt="preview"
+              className="w-full max-h-32 object-cover rounded-xl border border-gray-200 dark:border-gray-700 mt-2"
+            />
+          )}
+
+
+
+          <div className="space-y-3">
+            <div>
+              <Label className="text-md text-gray-800 dark:text-white/90">
+                {messages["slider_title"] || "Title"} :
+              </Label>
+              <InputField name="title" value={form.title} onChange={handleChange} />
+            </div>
+
+            <div>
+              <Label className="text-md text-gray-800 dark:text-white/90">
+                {messages["slider_subtitle"] || "Sub Title"} :
+              </Label>
+              <InputField name="subTitle" value={form.subTitle} onChange={handleChange} />
+            </div>
+
+            <div>
+              <Label className="text-md text-gray-800 dark:text-white/90">
+                {messages["slider_cta_link"] || "CTA Link"} :
+              </Label>
+              <InputField name="ctaLink" value={form.ctaLink} onChange={handleChange} />
+            </div>
+
+            <div>
+              <Label className="text-md text-gray-800 dark:text-white/90">
+                {messages["slider_cta_text"] || "CTA Text"} :
+              </Label>
+              <InputField name="ctaText" value={form.ctaText} onChange={handleChange} />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 mt-6">
+            <Button variant="outline" onClick={onClose} disabled={loading}>
+              {messages["cancel"] || "Cancel"}
+            </Button>
+            <Button type="submit" disabled={loading || !!fileError}>
+              {loading ? (
+                <>
+                  <LoadingIcon className="animate-spin -ml-1 mr-2" />
+                  {messages["updating"] || "Updating..."}
+                </>
+              ) : (
+                messages["update"] || "Update"
+              )}
+            </Button>
+          </div>
+        </Form>
+      </div>
+    </Modal>
+  );
+};
+
+export default EditSliderModal;
