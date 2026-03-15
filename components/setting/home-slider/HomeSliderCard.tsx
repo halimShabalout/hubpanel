@@ -71,7 +71,7 @@ const HomeSliderCard: React.FC<Props> = ({ slider, openDropdownId, onDropdownTog
             )}
           </div>
           <div className="relative flex-shrink-0">
-            
+
             <button
               className="dropdown-toggle text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
               onClick={onDropdownToggle}
@@ -79,7 +79,7 @@ const HomeSliderCard: React.FC<Props> = ({ slider, openDropdownId, onDropdownTog
             >
               <HorizontaLDots />
             </button>
-            
+
             <Dropdown
               isOpen={isDropdownOpen}
               onClose={onDropdownClose}
